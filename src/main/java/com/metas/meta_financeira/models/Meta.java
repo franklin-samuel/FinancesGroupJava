@@ -1,4 +1,4 @@
-package models;
+package com.metas.meta_financeira.models;
 
 import java.util.List;
 import java.util.ArrayList;
