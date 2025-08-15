@@ -8,7 +8,6 @@ import java.util.List;
 
 import java.util.ArrayList;
 
-@RestController
 @Service
 public class MetaService {
 
