@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class MetaControllerIntegrationTest {
 
     @Autowired
@@ -29,7 +31,7 @@ public class MetaControllerIntegrationTest {
         //Criar Meta
         mockMvc.perform(post("/meta")
                     .param("nome", "Viagem")
-                    .param("valor Total", "1000"))
+                    .param("valorTotal", "1000"))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(containsString("Viagem")));
 
@@ -45,7 +47,7 @@ public class MetaControllerIntegrationTest {
         //Criar Meta
         mockMvc.perform(post("/meta")
                         .param("nome", "Curso")
-                        .param("valor Total", "500"))
+                        .param("valorTotal", "500"))
                 .andExpect(status().isCreated());
 
         //BuscarMeta
