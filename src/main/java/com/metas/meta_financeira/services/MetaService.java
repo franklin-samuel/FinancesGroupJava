@@ -1,15 +1,18 @@
 package com.metas.meta_financeira.services;
 import com.metas.meta_financeira.models.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import java.util.ArrayList;
 
+@RestController
 @Service
 public class MetaService {
 
-    private List<Meta> metas = new ArrayList<>();
+    private final List<Meta> metas = new ArrayList<>();
 
     public Meta criarMeta(String nome, double valorTotal) {
         Meta meta = new Meta(nome, valorTotal);
@@ -45,5 +48,9 @@ public class MetaService {
     public List<String> relatorioContribuicoes(String nomeMeta) {
         Meta meta = buscarMetaPorNome(nomeMeta);
         return meta.getRelatorioContribuicoes();
+    }
+
+    public void excluirMeta(String nomeMeta) {
+        metas.remove(nomeMeta);
     }
 }
