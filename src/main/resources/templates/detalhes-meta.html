@@ -7,120 +7,282 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="container mx-auto mt-10 p-4">
-
-<!-- Cabeçalho -->
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold" th:text="${meta.nome}">Nome da Meta</h1>
-    <div>
-        <button @click="modalExcluir = true"
-                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-            Excluir
-        </button>
-        <a href="/meta" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">Voltar</a>
+<body class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 text-gray-100">
+<div class="container mx-auto px-6 py-8 max-w-6xl">
+    <!-- Cabeçalho -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2" th:text="${meta.nome}">Nome da Meta</h1>
+                <p class="text-gray-400">Gerencie sua meta financeira e acompanhe o progresso</p>
+            </div>
+            <div class="flex gap-3">
+                <button @click="modalExcluir = true"
+                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Excluir
+                </button>
+                <a href="/meta" class="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg border border-dark-600">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    Voltar
+                </a>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Informações gerais -->
-<div class="bg-white p-4 rounded shadow mb-6">
-    <p><b>Valor total:</b> R$ <span th:text="${meta.valorTotal}">0.00</span></p>
-    <p><b>Valor atual:</b> R$ <span th:text="${meta.valorAtual}">0.00</span></p>
-    <p><b>Faltante:</b> R$ <span th:text="${meta.restanteFaltante()}">0.00</span></p>
-</div>
+    <!-- Grid Principal -->
+    <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Coluna Principal -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Informações Financeiras -->
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-400"></i>
+                    Resumo Financeiro
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-400 text-sm font-medium">Meta Total</span>
+                            <i data-lucide="target" class="w-4 h-4 text-blue-400"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white">
+                            R$ <span th:text="${meta.valorTotal}">0.00</span>
+                        </p>
+                    </div>
+                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-400 text-sm font-medium">Valor Atual</span>
+                            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-emerald-400">
+                            R$ <span th:text="${meta.valorAtual}">0.00</span>
+                        </p>
+                    </div>
+                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-400 text-sm font-medium">Restante</span>
+                            <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-amber-400">
+                            R$ <span th:text="${meta.restanteFaltante()}">0.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-<!-- Integrantes -->
-<div class="bg-white p-4 rounded shadow mb-6">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">Integrantes</h2>
-        <button @click="modalIntegrante = true" class="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
-            <i data-lucide="plus"></i> Novo
-        </button>
+            <!-- Integrantes -->
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+                        Integrantes
+                    </h2>
+                    <button @click="modalIntegrante = true"
+                            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        Novo Integrante
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <div th:each="integrante : ${meta.integrantes}"
+                         class="bg-dark-900/50 border border-dark-600/30 rounded-lg p-4 hover:bg-dark-800/50 transition-all duration-200">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                                     th:text="${integrante.nome.substring(0,1).toUpperCase()}">N</div>
+                                <div>
+                                    <h3 class="font-medium text-white" th:text="${integrante.nome}">Nome Integrante</h3>
+                                    <p class="text-gray-400 text-sm">
+                                        <span th:text="${integrante.getPercentualDaMeta(meta.valorTotal)}">0</span>% da meta
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-emerald-400">
+                                    R$ <span th:text="${integrante.contribuicao}">0.00</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Ação Rápida -->
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
+                    Ação Rápida
+                </h3>
+                <button @click="modalContribuicao = true"
+                        class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    Adicionar Contribuição
+                </button>
+            </div>
+
+            <!-- Relatório -->
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i>
+                    Relatório de Contribuições
+                </h3>
+                <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                    <div th:each="linha : ${relatorio}"
+                         class="text-sm text-gray-300 p-2 bg-dark-900/30 rounded border-l-2 border-indigo-500/50"
+                         th:text="${linha}">Relatório</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <ul class="divide-y divide-gray-200">
-        <li th:each="integrante : ${meta.integrantes}" class="py-2 flex justify-between items-center">
-            <span th:text="${integrante.nome}">Nome Integrante</span>
-            <span>
-                R$ <span th:text="${integrante.contribuicao}">0.00</span>
-                (<span th:text="${integrante.getPercentualDaMeta(meta.valorTotal)}">0</span>%)
-            </span>
-        </li>
-    </ul>
-</div>
 
-<!-- Adicionar Contribuição -->
-<div class="flex justify-end mb-6">
-    <button @click="modalContribuicao = true" class="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
-        <i data-lucide="plus-circle"></i> Adicionar Contribuição
-    </button>
-</div>
-
-<!-- Relatório -->
-<div class="bg-white p-4 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Relatório de Contribuições</h2>
-    <ul class="list-disc pl-5">
-        <li th:each="linha : ${relatorio}" th:text="${linha}">Relatório</li>
-    </ul>
-</div>
-
-<!-- Modal Adicionar Integrante -->
-<div x-show="modalIntegrante" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div @click.away="modalIntegrante = false" class="bg-white p-6 rounded shadow w-96 relative">
-        <button @click="modalIntegrante = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-            <i data-lucide="x"></i>
-        </button>
-        <h3 class="text-lg font-semibold mb-4">Adicionar Integrante</h3>
-        <form th:action="@{/meta/{id}/add-integrante(id=${meta.id})}" method="post" class="flex flex-col gap-3">
-            <input type="text" name="nomeIntegrante" placeholder="Nome do integrante" class="border rounded px-3 py-2" required>
-            <input type="number" name="contribuicaoInicial" step="0.01" placeholder="Contribuição inicial" class="border rounded px-3 py-2" required>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Adicionar</button>
-        </form>
-    </div>
-</div>
-
-<!-- Modal Adicionar Contribuição -->
-<div x-show="modalContribuicao" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div @click.away="modalContribuicao = false" class="bg-white p-6 rounded shadow w-96 relative">
-        <button @click="modalContribuicao = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-            <i data-lucide="x"></i>
-        </button>
-        <h3 class="text-lg font-semibold mb-4">Adicionar Contribuição</h3>
-        <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="flex flex-col gap-3">
-            <select name="nomeIntegrante" class="border rounded px-3 py-2" required>
-                <option th:each="integrante : ${meta.integrantes}" th:value="${integrante.nome}" th:text="${integrante.nome}">Integrante</option>
-            </select>
-            <input type="number" name="valor" step="0.01" placeholder="Valor da contribuição" class="border rounded px-3 py-2" required>
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Adicionar</button>
-        </form>
-    </div>
-</div>
-
-<!-- Modal Excluir Meta -->
-<div x-show="modalExcluir"
-     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div @click.away="modalExcluir = false" class="bg-white p-6 rounded shadow w-96 relative">
-        <h3 class="text-lg font-semibold mb-4">Confirmar Exclusão</h3>
-        <p class="mb-6">Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</p>
-        <div class="flex justify-end gap-2">
-            <button @click="modalExcluir = false"
-                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-                Cancelar
+    <!-- Modal Adicionar Integrante -->
+    <div x-show="modalIntegrante" x-transition.opacity.duration.300ms
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+        <div @click.away="modalIntegrante = false"
+             x-transition.scale.origin.center.duration.200ms
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+            <button @click="modalIntegrante = false"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <form th:action="@{/meta/{id}/excluir(id=${meta.id})}" method="post">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-white mb-2">Adicionar Integrante</h3>
+                <p class="text-gray-400">Adicione um novo membro à sua meta</p>
+            </div>
+            <form th:action="@{/meta/{id}/add-integrante(id=${meta.id})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Nome do Integrante</label>
+                    <input type="text" name="nomeIntegrante" placeholder="Digite o nome completo"
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Contribuição Inicial</label>
+                    <input type="number" name="contribuicaoInicial" step="0.01" placeholder="0,00"
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" required>
+                </div>
                 <button type="submit"
-                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                    Sim, excluir
+                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 mt-6">
+                    Adicionar Integrante
                 </button>
             </form>
         </div>
     </div>
+
+    <!-- Modal Adicionar Contribuição -->
+    <div x-show="modalContribuicao" x-transition.opacity.duration.300ms
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+        <div @click.away="modalContribuicao = false"
+             x-transition.scale.origin.center.duration.200ms
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+            <button @click="modalContribuicao = false"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-white mb-2">Nova Contribuição</h3>
+                <p class="text-gray-400">Registre uma nova contribuição para a meta</p>
+            </div>
+            <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Integrante</label>
+                    <select name="nomeIntegrante"
+                            class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" required>
+                        <option value="" class="text-gray-500">Selecione um integrante</option>
+                        <option th:each="integrante : ${meta.integrantes}"
+                                th:value="${integrante.nome}"
+                                th:text="${integrante.nome}">Integrante</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Valor da Contribuição</label>
+                    <input type="number" name="valor" step="0.01" placeholder="0,00"
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" required>
+                </div>
+                <button type="submit"
+                        class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 mt-6">
+                    Registrar Contribuição
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Excluir Meta -->
+    <div x-show="modalExcluir" x-transition.opacity.duration.300ms
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+        <div @click.away="modalExcluir = false"
+             x-transition.scale.origin.center.duration.200ms
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+            <div class="mb-6">
+                <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2 text-center">Confirmar Exclusão</h3>
+                <p class="text-gray-400 text-center">Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="flex gap-3">
+                <button @click="modalExcluir = false"
+                        class="flex-1 px-4 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white rounded-lg font-medium transition-all duration-200 border border-dark-600">
+                    Cancelar
+                </button>
+                <form th:action="@{/meta/{id}/excluir(id=${meta.id})}" method="post" class="flex-1">
+                    <button type="submit"
+                            class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25">
+                        Sim, Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(51, 65, 85, 0.3);
+        border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.5);
+        border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.7);
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     });
 </script>
-
 </body>
 </html>
