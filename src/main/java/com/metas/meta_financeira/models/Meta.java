@@ -2,9 +2,12 @@ package com.metas.meta_financeira.models;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Meta  {
-    /// Atributos
+    private static final AtomicLong COUNTER = new AtomicLong();
+
+    private Long id;
     private String nome;
     private double valorAtual;
     private double valorTotal;
@@ -12,6 +15,7 @@ public class Meta  {
 
     /// Construtor
     public Meta(String nome, double valorTotal) {
+        this.id = COUNTER.incrementAndGet();
         this.nome = nome;
         this.valorAtual = 0;
         this.valorTotal = valorTotal;
@@ -54,6 +58,10 @@ public class Meta  {
 
 
     /// Métodos especiais
+    public Long getId() {
+        return id;
+    }
+
     public String getNome() {
         return nome;
     }
