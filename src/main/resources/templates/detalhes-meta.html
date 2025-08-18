@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ modalIntegrante: false, modalContribuicao: false }">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ modalIntegrante: false, modalContribuicao: false, modalExcluir: false }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,13 @@
 <!-- Cabeçalho -->
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold" th:text="${meta.nome}">Nome da Meta</h1>
-    <a href="/meta" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">Voltar</a>
+    <div>
+        <button @click="modalExcluir = true"
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+            Excluir
+        </button>
+        <a href="/meta" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">Voltar</a>
+    </div>
 </div>
 
 <!-- Informações gerais -->
@@ -86,6 +92,27 @@
             <input type="number" name="valor" step="0.01" placeholder="Valor da contribuição" class="border rounded px-3 py-2" required>
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Adicionar</button>
         </form>
+    </div>
+</div>
+
+<!-- Modal Excluir Meta -->
+<div x-show="modalExcluir"
+     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div @click.away="modalExcluir = false" class="bg-white p-6 rounded shadow w-96 relative">
+        <h3 class="text-lg font-semibold mb-4">Confirmar Exclusão</h3>
+        <p class="mb-6">Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</p>
+        <div class="flex justify-end gap-2">
+            <button @click="modalExcluir = false"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Cancelar
+            </button>
+            <form th:action="@{/meta/{id}/excluir(id=${meta.id})}" method="post">
+                <button type="submit"
+                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    Sim, excluir
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

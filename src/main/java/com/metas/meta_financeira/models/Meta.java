@@ -31,7 +31,7 @@ public class Meta  {
         for(Integrante integrante : integrantes) {
             if (integrante.getNome().equalsIgnoreCase(nome)) {
                 integrante.adicionarContribuicao(valor);
-                this.setValorAtual(this.getValorTotal() + valor);
+                this.setValorAtual(this.getValorAtual() + valor);
                 return;
             }
         }
