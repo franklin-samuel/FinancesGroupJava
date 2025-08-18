@@ -2,54 +2,209 @@
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ openModal: false }">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Metas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+<body class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 text-gray-100">
 
-<h1 class="text-3xl font-bold mb-6">Gerenciador de Metas Financeiras</h1>
+<div class="container mx-auto px-6 py-8 max-w-6xl">
+    <!-- Cabeçalho -->
+    <div class="mb-10">
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white">Gerenciador de Metas Financeiras</h1>
+            </div>
+            <p class="text-gray-400 text-lg">Crie, visualize e acompanhe suas metas de forma prática e eficiente</p>
+        </div>
 
-<!-- Botão Criar Meta -->
-<button @click="openModal = true"
-        class="mb-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-    Criar Meta
-</button>
+        <!-- Ações do Cabeçalho -->
+        <div class="flex justify-center">
+            <button @click="openModal = true"
+                    class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                Criar Nova Meta
+            </button>
+        </div>
+    </div>
 
-<!-- Lista de Metas -->
-<ul class="w-full max-w-md">
-    <li th:each="meta : ${metas}"
-        th:onclick="'window.location.href=\'/meta/' + ${meta.id} + '\';'"
-        class="bg-white p-4 mb-3 rounded shadow cursor-pointer hover:bg-blue-50 transition">
-        <span class="font-semibold" th:text="${meta.nome}">Nome da Meta</span>
-        <span class="float-right" th:text="'R$ ' + ${meta.valorTotal}">0.00</span>
-    </li>
-</ul>
+    <!-- Seção Principal -->
+    <div class="space-y-8">
+        <!-- Estatísticas Rápidas -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="target" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <span class="text-gray-400 font-medium">Total de Metas</span>
+                </div>
+                <p class="text-2xl font-bold text-white" th:text="${#lists.size(metas)}">0</p>
+            </div>
+        </div>
+
+        <!-- Lista de Metas -->
+        <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+            <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="list" class="w-6 h-6 text-blue-400"></i>
+                <h2 class="text-2xl font-bold text-white">Suas Metas Financeiras</h2>
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="meta : ${metas}"
+                     th:onclick="'window.location.href=\'/meta/' + ${meta.id} + '\';'"
+                     class="group bg-dark-900/50 border border-dark-600/30 rounded-xl p-6 cursor-pointer hover:bg-dark-800/60 hover:border-dark-500/50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform duration-200">
+                                <span th:text="${meta.nome.substring(0,1).toUpperCase()}">M</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors" th:text="${meta.nome}">Nome da Meta</h3>
+                                <p class="text-gray-400 text-sm">Clique para ver detalhes e gerenciar</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="dollar-sign" class="w-4 h-4 text-emerald-400"></i>
+                                <span class="text-2xl font-bold text-emerald-400" th:text="'R$ ' + ${meta.valorTotal}">R$ 0.00</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-400">
+                                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"></i>
+                                <span class="text-sm">Ver detalhes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado Vazio -->
+            <div th:if="${#lists.isEmpty(metas)}" class="text-center py-12">
+                <div class="w-16 h-16 bg-dark-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="target" class="w-8 h-8 text-gray-500"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-400 mb-2">Nenhuma meta encontrada</h3>
+                <p class="text-gray-500 mb-6">Comece criando sua primeira meta financeira</p>
+                <button @click="openModal = true"
+                        class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Criar Primeira Meta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Criar Meta -->
-<div x-show="openModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div @click.away="openModal = false" class="bg-white rounded-lg p-6 w-full max-w-sm">
-        <h2 class="text-xl font-bold mb-4">Criar Nova Meta</h2>
-        <form th:action="@{/meta/criarMeta}" method="post" class="space-y-4">
+<div x-show="openModal" x-transition.opacity.duration.300ms
+     class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+    <div @click.away="openModal = false"
+         x-transition.scale.origin.center.duration.200ms
+         class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+
+        <!-- Botão Fechar -->
+        <button @click="openModal = false"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-dark-700/50">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Ícone do Modal -->
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <i data-lucide="target" class="w-8 h-8 text-blue-400"></i>
+        </div>
+
+        <!-- Cabeçalho do Modal -->
+        <div class="text-center mb-8">
+            <h3 class="text-2xl font-bold text-white mb-3">Criar Nova Meta</h3>
+            <p class="text-gray-400">Defina um objetivo financeiro e acompanhe seu progresso em tempo real</p>
+        </div>
+
+        <!-- Formulário -->
+        <form th:action="@{/meta/criarMeta}" method="post" class="space-y-6">
             <div>
-                <label for="nome" class="block font-medium">Nome da Meta</label>
-                <input type="text" id="nome" name="nome" required
-                       class="w-full border rounded px-3 py-2 mt-1">
+                <label for="nome" class="block text-sm font-semibold text-gray-300 mb-3">Nome da Meta</label>
+                <div class="relative">
+                    <i data-lucide="edit-3" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                    <input type="text" id="nome" name="nome" required
+                           placeholder="Ex: Casa própria, Viagem dos sonhos..."
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-xl pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
+                </div>
             </div>
+
             <div>
-                <label for="valorTotal" class="block font-medium">Valor Total</label>
-                <input type="number" id="valorTotal" name="valorTotal" step="0.01" required
-                       class="w-full border rounded px-3 py-2 mt-1">
+                <label for="valorTotal" class="block text-sm font-semibold text-gray-300 mb-3">Valor Total da Meta</label>
+                <div class="relative">
+                    <i data-lucide="dollar-sign" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                    <input type="number" id="valorTotal" name="valorTotal" step="0.01" required
+                           placeholder="0,00"
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-xl pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Digite o valor total que deseja alcançar</p>
             </div>
-            <div class="flex justify-end space-x-2">
+
+            <div class="flex gap-4 pt-6">
                 <button type="button" @click="openModal = false"
-                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+                        class="flex-1 px-6 py-4 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white rounded-xl font-semibold transition-all duration-200 border border-dark-600">
+                    Cancelar
+                </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Criar</button>
+                        class="flex-1 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-blue-500/25 transform hover:scale-105">
+                    Criar Meta
+                </button>
             </div>
         </form>
     </div>
 </div>
 
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(51, 65, 85, 0.3);
+        border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.5);
+        border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.7);
+    }
+</style>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
 </body>
 </html>
