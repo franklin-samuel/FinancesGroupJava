@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ modalIntegrante: false, modalContribuicao: false }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Meta: ' + ${meta.nome}">Detalhes da Meta</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
 </head>
 <body class="container mx-auto mt-10 p-4">
 
@@ -14,65 +16,84 @@
     <a href="/meta" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">Voltar</a>
 </div>
 
-<!-- Informações gerais da meta -->
+<!-- Informações gerais -->
 <div class="bg-white p-4 rounded shadow mb-6">
     <p><b>Valor total:</b> R$ <span th:text="${meta.valorTotal}">0.00</span></p>
     <p><b>Valor atual:</b> R$ <span th:text="${meta.valorAtual}">0.00</span></p>
     <p><b>Faltante:</b> R$ <span th:text="${meta.restanteFaltante()}">0.00</span></p>
 </div>
 
-<!-- Lista de integrantes -->
+<!-- Integrantes -->
 <div class="bg-white p-4 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Integrantes</h2>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Integrantes</h2>
+        <button @click="modalIntegrante = true" class="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
+            <i data-lucide="plus"></i> Novo
+        </button>
+    </div>
     <ul class="divide-y divide-gray-200">
         <li th:each="integrante : ${meta.integrantes}" class="py-2 flex justify-between items-center">
             <span th:text="${integrante.nome}">Nome Integrante</span>
             <span>
-                    R$ <span th:text="${integrante.contribuicao}">0.00</span>
-                    (<span th:text="${integrante.getPercentualDaMeta(meta.valorTotal)}">0</span>%)
-                </span>
+                R$ <span th:text="${integrante.contribuicao}">0.00</span>
+                (<span th:text="${integrante.getPercentualDaMeta(meta.valorTotal)}">0</span>%)
+            </span>
         </li>
     </ul>
 </div>
 
-<!-- Formulário para adicionar integrante -->
-<div class="bg-white p-4 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Adicionar Integrante</h2>
-    <form th:action="@{/meta/{id}/add-integrante(id=${meta.id})}" method="post" class="flex flex-col gap-3">
-        <input type="text" name="nomeIntegrante" placeholder="Nome do integrante"
-               class="border rounded px-3 py-2" required>
-        <input type="number" name="contribuicaoInicial" step="0.01" placeholder="Contribuição inicial"
-               class="border rounded px-3 py-2" required>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-            Adicionar
-        </button>
-    </form>
+<!-- Adicionar Contribuição -->
+<div class="flex justify-end mb-6">
+    <button @click="modalContribuicao = true" class="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+        <i data-lucide="plus-circle"></i> Adicionar Contribuição
+    </button>
 </div>
 
-<!-- Formulário para registrar contribuição -->
-<div class="bg-white p-4 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Registrar Contribuição</h2>
-    <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="flex flex-col gap-3">
-        <select name="nomeIntegrante" class="border rounded px-3 py-2" required>
-            <option th:each="integrante : ${meta.integrantes}"
-                    th:value="${integrante.nome}"
-                    th:text="${integrante.nome}">Integrante</option>
-        </select>
-        <input type="number" name="valor" step="0.01" placeholder="Valor da contribuição"
-               class="border rounded px-3 py-2" required>
-        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-            Contribuir
-        </button>
-    </form>
-</div>
-
-<!-- Relatório de contribuições -->
+<!-- Relatório -->
 <div class="bg-white p-4 rounded shadow mb-6">
     <h2 class="text-xl font-semibold mb-4">Relatório de Contribuições</h2>
     <ul class="list-disc pl-5">
         <li th:each="linha : ${relatorio}" th:text="${linha}">Relatório</li>
     </ul>
 </div>
+
+<!-- Modal Adicionar Integrante -->
+<div x-show="modalIntegrante" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div @click.away="modalIntegrante = false" class="bg-white p-6 rounded shadow w-96 relative">
+        <button @click="modalIntegrante = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            <i data-lucide="x"></i>
+        </button>
+        <h3 class="text-lg font-semibold mb-4">Adicionar Integrante</h3>
+        <form th:action="@{/meta/{id}/add-integrante(id=${meta.id})}" method="post" class="flex flex-col gap-3">
+            <input type="text" name="nomeIntegrante" placeholder="Nome do integrante" class="border rounded px-3 py-2" required>
+            <input type="number" name="contribuicaoInicial" step="0.01" placeholder="Contribuição inicial" class="border rounded px-3 py-2" required>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Adicionar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Adicionar Contribuição -->
+<div x-show="modalContribuicao" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div @click.away="modalContribuicao = false" class="bg-white p-6 rounded shadow w-96 relative">
+        <button @click="modalContribuicao = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            <i data-lucide="x"></i>
+        </button>
+        <h3 class="text-lg font-semibold mb-4">Adicionar Contribuição</h3>
+        <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="flex flex-col gap-3">
+            <select name="nomeIntegrante" class="border rounded px-3 py-2" required>
+                <option th:each="integrante : ${meta.integrantes}" th:value="${integrante.nome}" th:text="${integrante.nome}">Integrante</option>
+            </select>
+            <input type="number" name="valor" step="0.01" placeholder="Valor da contribuição" class="border rounded px-3 py-2" required>
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Adicionar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
 
 </body>
 </html>

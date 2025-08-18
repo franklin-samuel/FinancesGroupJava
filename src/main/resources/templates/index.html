@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ openModal: false }"
-      xmlns:x-data="http://www.w3.org/1999/xhtml">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ openModal: false }">
 <head>
     <meta charset="UTF-8">
     <title>Gerenciador de Metas</title>
@@ -20,16 +19,15 @@
 <!-- Lista de Metas -->
 <ul class="w-full max-w-md">
     <li th:each="meta : ${metas}"
-        th:onclick="|window.location.href='/meta/${meta.id}'|"
+        th:onclick="'window.location.href=\'/meta/' + ${meta.id} + '\';'"
         class="bg-white p-4 mb-3 rounded shadow cursor-pointer hover:bg-blue-50 transition">
-        <span class="font-semibold" th:text="${meta.nome}"></span>
-        <span class="float-right" th:text="'R$ ' + ${meta.valorTotal}"></span>
+        <span class="font-semibold" th:text="${meta.nome}">Nome da Meta</span>
+        <span class="float-right" th:text="'R$ ' + ${meta.valorTotal}">0.00</span>
     </li>
 </ul>
 
-<!-- Modal -->
-<div x-show="openModal"
-     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+<!-- Modal Criar Meta -->
+<div x-show="openModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
     <div @click.away="openModal = false" class="bg-white rounded-lg p-6 w-full max-w-sm">
         <h2 class="text-xl font-bold mb-4">Criar Nova Meta</h2>
         <form th:action="@{/meta/criarMeta}" method="post" class="space-y-4">
@@ -47,9 +45,7 @@
                 <button type="button" @click="openModal = false"
                         class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Criar
-                </button>
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Criar</button>
             </div>
         </form>
     </div>
