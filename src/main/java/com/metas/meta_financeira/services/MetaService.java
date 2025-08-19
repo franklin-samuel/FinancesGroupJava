@@ -50,7 +50,7 @@ public class MetaService {
     // Listar metas
     public List<Meta> listarMetas(User owner) {
         List<Meta> metasByOwner = metaRepository.findByOwner(owner);
-        logger.info("[LOG] Listando metas do usuário id={}, email={} - total de metas={}", owner.getId(), owner.getEmail(), metas.size());
+        logger.info("[LOG] Listando metas do usuário id={}, email={}", owner.getId(), owner.getEmail());
         return metasByOwner;
     }
 
@@ -128,7 +128,6 @@ public class MetaService {
 
         Meta meta = buscarMetaPorId(id);
         metaRepository.delete(meta);
-
         logger.info("[LOG] Meta id={} excluída com sucesso", id);
     }
 }
