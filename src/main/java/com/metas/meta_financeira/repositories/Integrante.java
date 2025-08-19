@@ -1,4 +1,4 @@
-package repositories;
+package com.metas.meta_financeira.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

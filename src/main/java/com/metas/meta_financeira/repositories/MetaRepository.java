@@ -1,4 +1,4 @@
-package repositories;
+package com.metas.meta_financeira.repositories;
 
 import com.metas.meta_financeira.models.Meta;
 import com.metas.meta_financeira.models.User;
