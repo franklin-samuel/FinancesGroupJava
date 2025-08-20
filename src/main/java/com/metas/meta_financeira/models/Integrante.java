@@ -1,11 +1,25 @@
 package com.metas.meta_financeira.models;
 
 import java.util.IllformedLocaleException;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "integrante")
 public class Integrante {
-    /// Atributos
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
+
     private double contribuicao;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meta_id")
+    private Meta meta;
+
+    public Integrante() {}
 
     /// Construtor
     public Integrante(String nome, double contribuicaoInicial) {
@@ -29,19 +43,11 @@ public class Integrante {
     }
 
     /// Métodos especiais
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public double getContribuicao() {
-        return contribuicao;
-    }
-
-    public void setContribuicao(double contribuicao) {
-        this.contribuicao = contribuicao;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public double getContribuicao() { return contribuicao; }
+    public void setContribuicao(double contribuicao) { this.contribuicao = contribuicao; }
+    public Meta getMeta() { return meta; }
+    public void setMeta(Meta meta) { this.meta = meta; }
 }

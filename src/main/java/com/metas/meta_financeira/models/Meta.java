@@ -2,24 +2,39 @@ package com.metas.meta_financeira.models;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicLong;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "meta")
 public class Meta  {
-    private static final AtomicLong COUNTER = new AtomicLong();
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
+
+    @Column(name = "valor_atual")
     private double valorAtual;
+
+    @Column(name = "valor_total")
     private double valorTotal;
-    private List<Integrante> integrantes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @OneToMany(mappedBy = "meta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Integrante> integrantes = new ArrayList<>();
+
+    public Meta() {}
 
     /// Construtor
-    public Meta(String nome, double valorTotal) {
-        this.id = COUNTER.incrementAndGet();
+    public Meta(String nome, double valorTotal, User owner) {
         this.nome = nome;
-        this.valorAtual = 0;
         this.valorTotal = valorTotal;
-        this.integrantes = new ArrayList<>();
+        this.valorAtual = 0;
+        this.owner = owner;
     }
 
     /// Métodos Públicos
@@ -58,39 +73,15 @@ public class Meta  {
 
 
     /// Métodos especiais
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public double getValorTotal() {
-        return valorTotal;
-    }
-
-    public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
-    }
-
-    public List<Integrante> getIntegrantes() {
-        return integrantes;
-    }
-
-    public double getValorAtual() {
-        return valorAtual;
-    }
-
-    public void setValorAtual(double novoValor) {
-        this.valorAtual = novoValor;
-    }
-
-    public void setIntegrantes(List<Integrante> integrantes) {
-        this.integrantes = integrantes;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public double getValorAtual() { return valorAtual; }
+    public void setValorAtual(double valorAtual) { this.valorAtual = valorAtual; }
+    public double getValorTotal() { return valorTotal; }
+    public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
+    public List<Integrante> getIntegrantes() { return integrantes; }
+    public void setIntegrantes(List<Integrante> integrantes) { this.integrantes = integrantes; }
+    public User getOwner() { return owner; }
+    public void setOwner(User owner) { this.owner = owner; }
 }
