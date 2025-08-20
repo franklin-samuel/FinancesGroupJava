@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,108 +25,165 @@ public class MetaService {
         this.userRespository = userRespository;
     }
 
-    //Criar Meta
+    // Criar Meta
     @Transactional
     public Meta criarMeta(String nome, double valorTotal, User owner) {
-        logger.info("[LOG] Criando meta: nome={}, valorTotal={}", nome, valorTotal, owner.getEmail());
+        try {
+            logger.info("[LOG] Criando meta: nome={}, valorTotal={}, owner={}", nome, valorTotal, owner != null ? owner.getEmail() : "null");
 
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("O nome da meta não pode ser vazio.");
+            if (owner == null) {
+                throw new IllegalArgumentException("O usuário dono da meta não pode ser nulo.");
+            }
+            if (nome == null || nome.trim().isEmpty()) {
+                throw new IllegalArgumentException("O nome da meta não pode ser vazio.");
+            }
+            if (valorTotal <= 0) {
+                throw new IllegalArgumentException("O valor total da meta deve ser maior que zero.");
+            }
+
+            Meta meta = new Meta(nome, valorTotal, owner);
+            owner.addMeta(meta);
+
+            Meta saved = metaRepository.save(meta);
+
+            logger.info("[LOG] Meta criada com sucesso: id={}, nome={}", saved.getId(), saved.getNome());
+            return saved;
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao criar meta: nome={}, valorTotal={}", nome, valorTotal, e);
+            throw e;
         }
-        if (valorTotal <= 0) {
-            throw new IllegalArgumentException("O valor total da meta deve ser maior que zero.");
-        }
-
-        Meta meta = new Meta(nome, valorTotal, owner);
-        owner.addMeta(meta);
-
-        Meta saved = metaRepository.save(meta);
-
-        logger.info("[LOG] Meta criada com sucesso: id={}, nome={}", saved.getId(), saved.getNome());
-        return saved;
     }
 
     // Listar metas
     public List<Meta> listarMetas(User owner) {
-        List<Meta> metasByOwner = metaRepository.findByOwner(owner);
-        logger.info("[LOG] Listando metas do usuário id={}, email={}", owner.getId(), owner.getEmail());
-        return metasByOwner;
+        try {
+            if (owner == null) {
+                throw new IllegalArgumentException("Usuário não pode ser nulo ao listar metas.");
+            }
+            logger.info("[LOG] Listando metas do usuário id={}, email={}", owner.getId(), owner.getEmail());
+            List<Meta> metasByOwner = metaRepository.findByOwner(owner);
+            logger.info("[LOG] {} metas encontradas para usuário {}", metasByOwner.size(), owner.getEmail());
+            return metasByOwner;
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao listar metas", e);
+            throw e;
+        }
     }
 
     // Buscar por ID
     public Meta buscarMetaPorId(Long id) {
-        logger.info("[LOG] Buscando meta por id={}", id);
-        return metaRepository.findById(id).orElseThrow(() -> {
-            logger.warn("[LOG] Meta não encontrada com id={}", id);
-            return new IllegalArgumentException("Meta não encontrada com id: " + id);
-        });
+        try {
+            if (id == null || id <= 0) {
+                throw new IllegalArgumentException("ID da meta inválido.");
+            }
+            logger.info("[LOG] Buscando meta por id={}", id);
+            return metaRepository.findById(id).orElseThrow(() -> {
+                logger.warn("[LOG] Meta não encontrada com id={}", id);
+                return new IllegalArgumentException("Meta não encontrada com id: " + id);
+            });
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao buscar meta id={}", id, e);
+            throw e;
+        }
     }
 
     // Adicionar integrante
     @Transactional
     public void adicionarIntegrante(Long metaId, String nomeIntegrante, double contribuicaoInicial) {
-        logger.info("[LOG] Adicionando integrante '{}' na meta id={} com contribuição inicial={}",
-                nomeIntegrante, metaId, contribuicaoInicial);
+        try {
+            logger.info("[LOG] Adicionando integrante '{}' na meta id={} com contribuição inicial={}",
+                    nomeIntegrante, metaId, contribuicaoInicial);
 
-        if (nomeIntegrante == null || nomeIntegrante.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do integrante não pode ser vazio.");
+            if (nomeIntegrante == null || nomeIntegrante.trim().isEmpty()) {
+                throw new IllegalArgumentException("Nome do integrante não pode ser vazio.");
+            }
+            if (contribuicaoInicial < 0) {
+                throw new IllegalArgumentException("Contribuição inicial não pode ser negativa.");
+            }
+
+            Meta meta = buscarMetaPorId(metaId);
+
+            // Verificar se integrante já existe
+            boolean exists = meta.getIntegrantes().stream()
+                    .anyMatch(i -> i.getNome().equalsIgnoreCase(nomeIntegrante));
+            if (exists) {
+                throw new IllegalArgumentException("Já existe um integrante com este nome na meta.");
+            }
+
+            Integrante integrante = new Integrante(nomeIntegrante, 0);
+            integrante.setMeta(meta);
+            meta.adicionarIntegrante(integrante);
+
+            if (contribuicaoInicial > 0) {
+                meta.adicionarContribuicaoIntegrante(nomeIntegrante, contribuicaoInicial);
+            }
+
+            metaRepository.save(meta);
+
+            logger.info("[LOG] Integrante '{}' adicionado com sucesso na meta id={}", nomeIntegrante, metaId);
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao adicionar integrante '{}' na meta id={}", nomeIntegrante, metaId, e);
+            throw e;
         }
-        if (contribuicaoInicial < 0) {
-            throw new IllegalArgumentException("Contribuição inicial não pode ser negativa.");
-        }
-
-        Meta meta = buscarMetaPorId(metaId);
-
-        Integrante integrante = new Integrante(nomeIntegrante, 0);
-        integrante.setMeta(meta);
-        meta.adicionarIntegrante(integrante);
-
-        if (contribuicaoInicial > 0) {
-            meta.adicionarContribuicaoIntegrante(nomeIntegrante, contribuicaoInicial);
-        }
-
-        metaRepository.save(meta);
-
-        logger.info("[LOG] Integrante '{}' adicionado na meta id={}", nomeIntegrante, metaId);
     }
 
     // Contribuir
     @Transactional
     public void contribuir(Long metaId, String nomeIntegrante, double valor) {
-        logger.info("[LOG] Registrando contribuição metaId={}, integrante='{}', valor={}",
-                metaId, nomeIntegrante, valor);
+        try {
+            logger.info("[LOG] Registrando contribuição metaId={}, integrante='{}', valor={}", metaId, nomeIntegrante, valor);
 
-        if (valor <= 0) {
-            throw new IllegalArgumentException("O valor da contribuição deve ser maior que zero.");
+            if (valor <= 0) {
+                throw new IllegalArgumentException("O valor da contribuição deve ser maior que zero.");
+            }
+
+            Meta meta = buscarMetaPorId(metaId);
+
+            // Verificar se integrante existe antes de contribuir
+            boolean integranteExiste = meta.getIntegrantes().stream()
+                    .anyMatch(i -> i.getNome().equalsIgnoreCase(nomeIntegrante));
+            if (!integranteExiste) {
+                throw new IllegalArgumentException("Integrante não encontrado na meta.");
+            }
+
+            meta.adicionarContribuicaoIntegrante(nomeIntegrante, valor);
+            metaRepository.save(meta);
+
+            logger.info("[LOG] Contribuição registrada com sucesso para integrante='{}', metaId={}", nomeIntegrante, metaId);
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao registrar contribuição: integrante='{}', metaId={}, valor={}", nomeIntegrante, metaId, valor, e);
+            throw e;
         }
-
-        Meta meta = buscarMetaPorId(metaId);
-        meta.adicionarContribuicaoIntegrante(nomeIntegrante, valor);
-
-        metaRepository.save(meta);
-
-        logger.info("[LOG] Contribuição registrada com sucesso para integrante='{}', metaId={}",
-                nomeIntegrante, metaId);
     }
 
     // Relatório de contribuições
     public List<String> relatorioContribuicoes(Long metaId) {
-        logger.info("[LOG] Gerando relatório da meta id={}", metaId);
-
-        Meta meta = buscarMetaPorId(metaId);
-        List<String> relatorio = meta.getRelatorioContribuicoes();
-
-        logger.info("[LOG] Relatório gerado com {} linhas para meta id={}", relatorio.size(), metaId);
-        return relatorio;
+        try {
+            logger.info("[LOG] Gerando relatório da meta id={}", metaId);
+            Meta meta = buscarMetaPorId(metaId);
+            if (meta == null) {
+                throw new IllegalArgumentException("Meta não encontrada para gerar relatório.");
+            }
+            List<String> relatorio = meta.getRelatorioContribuicoes();
+            logger.info("[LOG] Relatório gerado com {} linhas para meta id={}", relatorio.size(), metaId);
+            return relatorio;
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao gerar relatório da meta id={}", metaId, e);
+            throw e;
+        }
     }
 
     // Excluir meta
     @Transactional
     public void excluirMeta(Long id) {
-        logger.info("[LOG] Excluindo meta id={}", id);
-
-        Meta meta = buscarMetaPorId(id);
-        metaRepository.delete(meta);
-        logger.info("[LOG] Meta id={} excluída com sucesso", id);
+        try {
+            logger.info("[LOG] Excluindo meta id={}", id);
+            Meta meta = buscarMetaPorId(id);
+            metaRepository.delete(meta);
+            logger.info("[LOG] Meta id={} excluída com sucesso", id);
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao excluir meta id={}", id, e);
+            throw e;
+        }
     }
 }
