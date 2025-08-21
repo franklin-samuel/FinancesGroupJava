@@ -20,8 +20,8 @@ public class User {
 
     private String name;
 
-    @Column(name = "pictureUrl")
-    private String pictureUrl;
+    @Column(name = "picture")
+    public String picture;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meta> metas = new ArrayList<>();
@@ -29,11 +29,11 @@ public class User {
     public User() {}
 
     //Construtor
-    public User(String oauthId, String email, String name, String pictureUrl) {
+    public User(String oauthId, String email, String name, String picture) {
         this.oauthId = oauthId;
         this.email = email;
         this.name = name;
-        this.pictureUrl = pictureUrl;
+        this.picture = picture;
     }
 
     //Getters e Setters
@@ -48,8 +48,8 @@ public class User {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public String getPictureUrl() { return pictureUrl; }
-    public void setPictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+    public String getPictureUrl() { return picture; }
+    public void setPictureUrl(String pictureUrl) { this.picture = pictureUrl; }
 
     public List<Meta> getMetas() { return metas; }
     public void setMetas(List<Meta> metas) { this.metas = metas; }

@@ -13,20 +13,22 @@ public class SecurityConfig {
         http
                 // Autorização das rotas
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                        .requestMatchers("/meta/**").authenticated() // apenas rotas /meta/* precisam de auth
                         .anyRequest().authenticated()
                 )
                 // Login com OAuth2 (Google)
                 .oauth2Login(oauth -> oauth
-                        .defaultSuccessUrl("/meta", true) // sempre manda pro /meta
+                        .defaultSuccessUrl("/", true) // após login, volta para home
+                        .loginPage("/") // página de login customizada é a própria home
                 )
                 // Logout
                 .logout(logout -> logout
                         .logoutSuccessUrl("/") // depois de logout, manda pra home
                         .permitAll()
                 )
-                // CSRF pode ser mantido habilitado
-                .csrf(csrf -> csrf.disable()); // se vc for usar só templates Thymeleaf, pode deixar ativado
+                // CSRF desabilitado para simplificar
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
