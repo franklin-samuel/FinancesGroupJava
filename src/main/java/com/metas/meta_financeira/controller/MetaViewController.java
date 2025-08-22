@@ -1,6 +1,8 @@
 package com.metas.meta_financeira.controller;
 
+import com.metas.meta_financeira.models.Integrante;
 import com.metas.meta_financeira.models.Meta;
+import com.metas.meta_financeira.models.Moeda;
 import com.metas.meta_financeira.models.User;
 import com.metas.meta_financeira.services.MetaService;
 import com.metas.meta_financeira.services.UserService;
@@ -11,6 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/meta")
@@ -37,7 +43,7 @@ public class MetaViewController {
             return "index";
         } catch (Exception e) {
             log.error("[LOG] Erro ao listar metas", e);
-            return "error"; // página de erro genérica
+            return "error";
         }
     }
 
@@ -45,7 +51,7 @@ public class MetaViewController {
     @PostMapping("/criarMeta")
     public String criarMeta(
             @RequestParam String nome,
-            @RequestParam double valorTotal,
+            @RequestParam BigDecimal valorTotal,
             @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
@@ -53,7 +59,7 @@ public class MetaViewController {
             User user = extrairOuCriarUser(principal);
             metaService.criarMeta(nome, valorTotal, user);
             log.info("[LOG] Meta criada com sucesso para usuário {}", user.getEmail());
-            return "redirect:/";
+            return "redirect:/meta";
         } catch (Exception e) {
             log.error("[LOG] Erro ao criar meta: nome={} valorTotal={}", nome, valorTotal, e);
             return "error";
@@ -66,8 +72,23 @@ public class MetaViewController {
         try {
             log.info("[LOG] Buscando detalhes da meta id={}", id);
             Meta meta = metaService.buscarMetaPorId(id);
+
+            // Valores formatados
             model.addAttribute("meta", meta);
-            model.addAttribute("relatorio", metaService.relatorioContribuicoes(id));
+            model.addAttribute("valorTotal", new Moeda(meta.getValorTotal()).formatado());
+            model.addAttribute("valorAtual", new Moeda(meta.getValorAtual()).formatado());
+            model.addAttribute("restante", new Moeda(meta.restanteFaltante()).formatado());
+
+            // Contribuições individuais formatadas
+            List<String> relatorioFormatado = meta.getIntegrantes().stream()
+                    .map(i -> String.format("%s contribuiu %s (%.2f%% da meta)",
+                            i.getNome(),
+                            new Moeda(i.getContribuicao()).formatado(),
+                            i.getPercentualDaMeta(meta.getValorTotal()).doubleValue()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("relatorio", relatorioFormatado);
+
             log.info("[LOG] Detalhes da meta id={} carregados com sucesso", id);
             return "detalhes-meta";
         } catch (Exception e) {
@@ -81,7 +102,7 @@ public class MetaViewController {
     public String adicionarIntegrante(
             @PathVariable Long id,
             @RequestParam String nomeIntegrante,
-            @RequestParam double contribuicaoInicial
+            @RequestParam BigDecimal contribuicaoInicial
     ) {
         try {
             log.info("[LOG] Adicionando integrante '{}' na meta id={} com contribuição inicial={}", nomeIntegrante, id, contribuicaoInicial);
@@ -99,7 +120,7 @@ public class MetaViewController {
     public String contribuir(
             @PathVariable Long id,
             @RequestParam String nomeIntegrante,
-            @RequestParam double valor
+            @RequestParam BigDecimal valor
     ) {
         try {
             log.info("[LOG] Contribuição de valor={} pelo integrante '{}' na meta id={}", valor, nomeIntegrante, id);
@@ -119,19 +140,16 @@ public class MetaViewController {
             log.info("[LOG] Excluindo meta id={}", id);
             metaService.excluirMeta(id);
             log.info("[LOG] Meta id={} excluída com sucesso", id);
-            return "redirect:/";
+            return "redirect:/meta";
         } catch (Exception e) {
             log.error("[LOG] Erro ao excluir meta id={}", id, e);
             return "error";
         }
     }
 
+    // Verifica se usuário está autenticado
     public boolean isAuthenticated(OAuth2User principal) {
-        if (principal != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return principal != null;
     }
 
     private User extrairOuCriarUser(OAuth2User principal) {
@@ -147,7 +165,7 @@ public class MetaViewController {
             return user;
         } catch (Exception e) {
             log.error("[LOG] Erro ao extrair ou criar usuário OAuth2", e);
-            throw e; // relança para ser tratado nos métodos chamadores
+            throw e;
         }
     }
 }
