@@ -1,5 +1,6 @@
 package com.metas.meta_financeira.models;
 
+import java.math.BigDecimal;
 import java.util.IllformedLocaleException;
 import jakarta.persistence.*;
 
@@ -13,7 +14,7 @@ public class Integrante {
 
     private String nome;
 
-    private double contribuicao;
+    private BigDecimal contribuicao;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meta_id")
@@ -22,32 +23,36 @@ public class Integrante {
     public Integrante() {}
 
     /// Construtor
-    public Integrante(String nome, double contribuicaoInicial) {
+    public Integrante(String nome, BigDecimal contribuicaoInicial) {
         this.nome = nome;
-        this.contribuicao = contribuicaoInicial;
+        this.contribuicao = contribuicaoInicial != null ? contribuicaoInicial : BigDecimal.ZERO;
     }
 
     /// Métodos públicos
-    public void adicionarContribuicao(double valor) {
-        if (valor <= 0) {
+    public void adicionarContribuicao(BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllformedLocaleException("Valor da contribuição não pode ser 0 nem negativo.");
         }
-        this.setContribuicao(this.getContribuicao() + valor);
+        this.setContribuicao(this.getContribuicao().add(valor));
     }
 
-    public double getPercentualDaMeta(double valorTotalMeta) {
-        if (valorTotalMeta == 0) {
-            return 0;
+    public BigDecimal getPercentualDaMeta(BigDecimal valorTotalMeta) {
+        if (valorTotalMeta == null || valorTotalMeta.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
         }
-        return (contribuicao / valorTotalMeta) * 100;
+        return this.getContribuicao()
+                .divide(valorTotalMeta, 4, BigDecimal.ROUND_HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
     }
 
     /// Métodos especiais
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
-    public double getContribuicao() { return contribuicao; }
-    public void setContribuicao(double contribuicao) { this.contribuicao = contribuicao; }
+    public BigDecimal getContribuicao() { return contribuicao; }
+    public void setContribuicao(BigDecimal contribuicao) {
+        this.contribuicao = contribuicao != null ? contribuicao : BigDecimal.ZERO;
+    }
     public Meta getMeta() { return meta; }
     public void setMeta(Meta meta) { this.meta = meta; }
 }

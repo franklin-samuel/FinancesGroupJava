@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class MetaService {
 
     // Criar Meta
     @Transactional
-    public Meta criarMeta(String nome, double valorTotal, User owner) {
+    public Meta criarMeta(String nome, BigDecimal valorTotal, User owner) {
         try {
             logger.info("[LOG] Criando meta: nome={}, valorTotal={}, owner={}", nome, valorTotal, owner != null ? owner.getEmail() : "null");
 
@@ -37,7 +38,7 @@ public class MetaService {
             if (nome == null || nome.trim().isEmpty()) {
                 throw new IllegalArgumentException("O nome da meta não pode ser vazio.");
             }
-            if (valorTotal <= 0) {
+            if (valorTotal == null || valorTotal.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("O valor total da meta deve ser maior que zero.");
             }
 
@@ -89,7 +90,7 @@ public class MetaService {
 
     // Adicionar integrante
     @Transactional
-    public void adicionarIntegrante(Long metaId, String nomeIntegrante, double contribuicaoInicial) {
+    public void adicionarIntegrante(Long metaId, String nomeIntegrante, BigDecimal contribuicaoInicial) {
         try {
             logger.info("[LOG] Adicionando integrante '{}' na meta id={} com contribuição inicial={}",
                     nomeIntegrante, metaId, contribuicaoInicial);
@@ -97,7 +98,7 @@ public class MetaService {
             if (nomeIntegrante == null || nomeIntegrante.trim().isEmpty()) {
                 throw new IllegalArgumentException("Nome do integrante não pode ser vazio.");
             }
-            if (contribuicaoInicial < 0) {
+            if (contribuicaoInicial != null && contribuicaoInicial.compareTo(BigDecimal.ZERO) < 0) {
                 throw new IllegalArgumentException("Contribuição inicial não pode ser negativa.");
             }
 
@@ -110,16 +111,15 @@ public class MetaService {
                 throw new IllegalArgumentException("Já existe um integrante com este nome na meta.");
             }
 
-            Integrante integrante = new Integrante(nomeIntegrante, 0);
+            Integrante integrante = new Integrante(nomeIntegrante, BigDecimal.ZERO);
             integrante.setMeta(meta);
             meta.adicionarIntegrante(integrante);
 
-            if (contribuicaoInicial > 0) {
+            if (contribuicaoInicial != null && contribuicaoInicial.compareTo(BigDecimal.ZERO) > 0) {
                 meta.adicionarContribuicaoIntegrante(nomeIntegrante, contribuicaoInicial);
             }
 
             metaRepository.save(meta);
-
             logger.info("[LOG] Integrante '{}' adicionado com sucesso na meta id={}", nomeIntegrante, metaId);
         } catch (Exception e) {
             logger.error("[LOG] Erro ao adicionar integrante '{}' na meta id={}", nomeIntegrante, metaId, e);
@@ -129,11 +129,11 @@ public class MetaService {
 
     // Contribuir
     @Transactional
-    public void contribuir(Long metaId, String nomeIntegrante, double valor) {
+    public void contribuir(Long metaId, String nomeIntegrante, BigDecimal valor) {
         try {
             logger.info("[LOG] Registrando contribuição metaId={}, integrante='{}', valor={}", metaId, nomeIntegrante, valor);
 
-            if (valor <= 0) {
+            if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("O valor da contribuição deve ser maior que zero.");
             }
 
