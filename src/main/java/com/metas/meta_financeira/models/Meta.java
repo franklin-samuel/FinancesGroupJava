@@ -21,6 +21,9 @@ public class Meta  {
     @Column(name = "valor_total", precision = 19, scale = 2)
     private BigDecimal valorTotal;
 
+    @Enumerated(EnumType.STRING)
+    private StatusMeta status = StatusMeta.ATIVA;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -45,14 +48,26 @@ public class Meta  {
     }
 
     public void adicionarContribuicaoIntegrante(String nome, BigDecimal valor) {
+        if (status != StatusMeta.ATIVA) {
+            throw new IllegalStateException("Não é possível contribuir para uma meta já concluída.");
+        }
+
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor da contribuição deve ser maior que zero.");
         }
 
+        BigDecimal faltante = restanteFaltante();
+
+        BigDecimal valorAdicionado = valor.compareTo(faltante) > 0 ? faltante : valor;
+
         for(Integrante integrante : integrantes) {
             if (integrante.getNome().equalsIgnoreCase(nome)) {
-                integrante.adicionarContribuicao(valor);
-                this.setValorAtual(this.getValorAtual().add(valor));
+                integrante.adicionarContribuicao(valorAdicionado);
+                this.setValorAtual(this.getValorAtual().add(valorAdicionado));
+
+                if (this.valorAtual.compareTo(this.valorTotal) >= 0) {
+                    this.status = StatusMeta.ATINGIDA;
+                }
                 return;
             }
         }
@@ -74,7 +89,8 @@ public class Meta  {
     }
 
     public BigDecimal restanteFaltante() {
-        return getValorTotal().subtract(getValorAtual());
+        BigDecimal restante = valorTotal.subtract(valorAtual);
+        return restante.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : restante;
     }
 
 
@@ -95,4 +111,6 @@ public class Meta  {
     }
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
+    public StatusMeta getStatus() { return status; }
+    public void setStatus(StatusMeta status) { this.status = status; }
 }
