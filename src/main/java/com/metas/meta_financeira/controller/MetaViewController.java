@@ -59,7 +59,7 @@ public class MetaViewController {
             User user = extrairOuCriarUser(principal);
             metaService.criarMeta(nome, valorTotal, user);
             log.info("[LOG] Meta criada com sucesso para usuário {}", user.getEmail());
-            return "redirect:/meta";
+            return "redirect:/";
         } catch (Exception e) {
             log.error("[LOG] Erro ao criar meta: nome={} valorTotal={}", nome, valorTotal, e);
             return "error";
@@ -140,7 +140,7 @@ public class MetaViewController {
             log.info("[LOG] Excluindo meta id={}", id);
             metaService.excluirMeta(id);
             log.info("[LOG] Meta id={} excluída com sucesso", id);
-            return "redirect:/meta";
+            return "redirect:/";
         } catch (Exception e) {
             log.error("[LOG] Erro ao excluir meta id={}", id, e);
             return "error";
