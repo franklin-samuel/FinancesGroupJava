@@ -47,6 +47,34 @@ public class MetaViewController {
         }
     }
 
+    // Página de histórico(arquivadas)
+    @GetMapping("/arquivadas")
+    public String arquivadas(Model model, @AuthenticationPrincipal OAuth2User principal) {
+        try {
+            log.info("[LOG] Iniciando listagem de metas arquivadas");
+            User user = extrairOuCriarUser(principal);
+            model.addAttribute("metasConcluidas", metaService.listarMetasConcluidas(user));
+            log.info("[LOG] Listagem de metas concluídas para usuário {}", user.getEmail());
+            return "metas-arquivadas";
+        } catch (Exception e) {
+            log.error("[LOG] Erro ao listar metas concluídas", e);
+            return "error";
+        }
+    }
+
+    // Concluir meta -> Mostrar página de parabéns
+    @PostMapping("/{id}/concluir")
+    public String concluirMeta(@PathVariable Long id) {
+        try {
+            log.info("[LOG] Concluindo meta {}...", id);
+            metaService.concluirMeta(id);
+            return "redirect:/meta/" + id + "?concluida=true";
+        } catch (Exception e) {
+            log.error("Não foi possível concluír a meta {}", id);
+            throw e;
+        }
+    }
+
     // Criar nova meta
     @PostMapping("/criarMeta")
     public String criarMeta(

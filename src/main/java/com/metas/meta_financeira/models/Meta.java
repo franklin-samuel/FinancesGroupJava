@@ -1,10 +1,12 @@
 package com.metas.meta_financeira.models;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 @Entity
 @Table(name = "meta")
@@ -21,6 +23,9 @@ public class Meta  {
 
     @Column(name = "valor_total", precision = 19, scale = 2)
     private BigDecimal valorTotal;
+
+    @Column(name = "criada_em")
+    private LocalDateTime criadaEm;
 
     @Column(name = "atingida_em")
     private LocalDateTime atingidaEm;
@@ -45,6 +50,7 @@ public class Meta  {
         this.nome = nome;
         this.valorTotal = valorTotal != null ? valorTotal : BigDecimal.ZERO;
         this.valorAtual = BigDecimal.ZERO;
+        this.criadaEm = LocalDateTime.now();
         this.owner = owner;
     }
 
@@ -126,6 +132,8 @@ public class Meta  {
             i.setMeta(this);
         }
     }
+    public LocalDateTime getCriadaEm() { return criadaEm; }
+    public void setCriadaEm(LocalDateTime criadaEm) { this.criadaEm = criadaEm; }
     public LocalDateTime getAtingidaEm() { return atingidaEm; }
     public void setAtingidaEm(LocalDateTime atingidaEm) { this.atingidaEm = atingidaEm; }
     public LocalDateTime getConcluidaEm() { return concluidaEm; }

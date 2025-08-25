@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack - Erro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 text-gray-100 flex items-center justify-center">
+
+<div class="text-center px-6">
+    <!-- Ícone de erro -->
+    <div class="w-20 h-20 bg-gradient-to-r from-red-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-900/40">
+        <i data-lucide="alert-triangle" class="w-10 h-10 text-white"></i>
+    </div>
+
+    <!-- Texto -->
+    <h1 class="text-5xl font-extrabold text-white mb-4">Ops!</h1>
+    <p class="text-lg text-gray-400 mb-8">
+        Algo deu errado. <br>
+        Não se preocupe, estamos trabalhando para resolver isso.
+    </p>
+
+    <!-- Botões -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button onclick="window.location.href='/'"
+                class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-blue-500/30 transform hover:scale-105">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            Voltar para Início
+        </button>
+
+        <button onclick="window.location.reload()"
+                class="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-200 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-dark-600 shadow-lg hover:shadow-gray-700/30">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+            Tentar Novamente
+        </button>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+</body>
+</html>
