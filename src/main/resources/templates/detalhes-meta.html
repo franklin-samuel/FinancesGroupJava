@@ -311,11 +311,11 @@
 
                 <!-- Botões de Ação -->
                 <div class="flex gap-3">
-                    <button onclick="window.alert('Funcionalidade será implementada em breve!')"
-                            class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2">
+                    <a th:href="@{'/meta/' + ${meta.id} + '/certificado'}"
+                       class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
                         Baixar Certificado
-                    </button>
+                    </a>
 
 
                     <button @click="window.location.href='/'"

@@ -184,14 +184,13 @@
         </div>
     </div>
 
-    <!-- Modal de Parabéns para Metas Arquivadas -->
+    <!-- Modal de Parabéns -->
     <div x-show="modalParabens" x-transition.opacity.duration.500ms
          class="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-50">
         <div @click.away="modalParabens = false"
              x-transition.scale.origin.center.duration.300ms
              class="bg-gradient-to-br from-dark-800 to-dark-900 border border-emerald-500/50 p-8 rounded-2xl shadow-2xl w-full max-w-lg mx-4 relative overflow-hidden">
 
-            <!-- Animação de confetes -->
             <div class="absolute inset-0 pointer-events-none">
                 <div class="absolute top-4 left-4 w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
                 <div class="absolute top-8 right-6 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
@@ -203,7 +202,6 @@
 
             <!-- Conteúdo do Modal -->
             <div class="text-center relative z-10">
-                <!-- Ícone de Troféu -->
                 <div class="w-24 h-24 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                     <i data-lucide="trophy" class="w-12 h-12 text-white"></i>
                 </div>
@@ -258,7 +256,6 @@
                     </div>
                 </template>
 
-                <!-- Versão usando Thymeleaf (fallback) -->
                 <div th:each="meta : ${metasConcluidas}" x-show="selectedMetaId && selectedMetaId == $el.dataset.metaId" th:attr="data-meta-id=${meta.id}">
                     <!-- Detalhes da Meta -->
                     <div class="bg-dark-900/50 rounded-xl p-6 mb-6 border border-emerald-500/30">
@@ -302,7 +299,7 @@
 
                 <!-- Botões de Ação -->
                 <div class="flex gap-3">
-                    <button onclick="window.alert('Funcionalidade será implementada em breve!')"
+                    <button @click="downloadCertificado(selectedMetaId)"
                             class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
                         Baixar Certificado
@@ -340,11 +337,27 @@
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
 
-        // Re-initialize icons after Alpine.js updates
         document.addEventListener('alpine:updated', () => {
             lucide.createIcons();
         });
     });
+
+    function downloadCertificado(metaId) {
+        console.log('Tentando baixar certificado para meta ID:', metaId);
+
+        if (!metaId) {
+            console.error('ID da meta não encontrado');
+            alert('Erro: ID da meta não encontrado');
+            return;
+        }
+
+        try {
+            window.location.href = `/meta/${metaId}/certificado`;
+        } catch (error) {
+            console.error('Erro ao baixar certificado:', error);
+            alert('Erro ao baixar certificado. Tente novamente.');
+        }
+    }
 </script>
 </body>
 </html>
