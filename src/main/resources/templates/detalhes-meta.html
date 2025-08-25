@@ -1,5 +1,17 @@
 <!doctype html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{ modalIntegrante: false, modalContribuicao: false, modalExcluir: false }">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" x-data="{
+    modalIntegrante: false,
+    modalContribuicao: false,
+    modalExcluir: false,
+    modalParabens: false,
+    init() {
+        // Verifica se tem o parâmetro concluida=true na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('concluida') === 'true') {
+            this.modalParabens = true;
+        }
+    }
+}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,10 +48,30 @@
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-white mb-2" th:text="${meta.nome}">Nome da Meta</h1>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-3xl font-bold text-white" th:text="${meta.nome}">Nome da Meta</h1>
+                    <span th:if="${meta.status.name() == 'ATINGIDA'}" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
+                        🎉 ATINGIDA!
+                    </span>
+                    <span th:if="${meta.status.name() == 'ATIVA'}" class="bg-blue-500/20 text-blue-400 text-sm font-medium px-3 py-1 rounded-full border border-blue-500/30">
+                        ATIVA
+                    </span>
+                    <span th:if="${meta.status.name() == 'CONCLUIDA'}" class="bg-emerald-500/20 text-emerald-400 text-sm font-medium px-3 py-1 rounded-full border border-emerald-500/30">
+                        CONCLUÍDA
+                    </span>
+                </div>
                 <p class="text-gray-400">Gerencie sua meta financeira e acompanhe o progresso</p>
             </div>
             <div class="flex gap-3">
+                <!-- Botão de Concluir Meta (só aparece se status for ATINGIDA) -->
+                <form th:if="${meta.status.name() == 'ATINGIDA'}" th:action="@{/meta/{id}/concluir(id=${meta.id})}" method="post" class="inline">
+                    <button type="submit"
+                            class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 transform hover:scale-105">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        Concluir Meta
+                    </button>
+                </form>
+
                 <button @click="modalExcluir = true"
                         class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -70,7 +102,7 @@
                             <i data-lucide="target" class="w-4 h-4 text-blue-400"></i>
                         </div>
                         <p class="text-2xl font-bold text-white">
-                            R$ <span th:text="${meta.valorTotal}">0.00</span>
+                            <span th:text="${valorTotal}">R$ 0,00</span>
                         </p>
                     </div>
                     <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
@@ -79,7 +111,7 @@
                             <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
                         </div>
                         <p class="text-2xl font-bold text-emerald-400">
-                            R$ <span th:text="${meta.valorAtual}">0.00</span>
+                            <span th:text="${valorAtual}">R$ 0,00</span>
                         </p>
                     </div>
                     <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
@@ -88,8 +120,24 @@
                             <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
                         </div>
                         <p class="text-2xl font-bold text-amber-400">
-                            R$ <span th:text="${meta.restanteFaltante()}">0.00</span>
+                            <span th:text="${restante}">R$ 0,00</span>
                         </p>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mt-6">
+                    <div class="flex justify-between text-sm text-gray-400 mb-2">
+                        <span>Progresso</span>
+                        <span>
+                            <span th:text="${#numbers.formatDecimal((meta.valorAtual / meta.valorTotal) * 100, 1, 1)}">0.0</span>%
+                        </span>
+                    </div>
+                    <div class="w-full bg-dark-700/50 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 relative overflow-hidden"
+                             th:style="'width: ' + ${(meta.valorAtual / meta.valorTotal) * 100} + '%'">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,9 +150,11 @@
                         Integrantes
                     </h2>
                     <button @click="modalIntegrante = true"
-                            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i>
-                        Novo Integrante
+                            th:disabled="${meta.status.name() != 'ATIVA'}"
+                            th:class="${meta.status.name() != 'ATIVA'} ? 'opacity-50 cursor-not-allowed' : ''"
+                            class="flex items-center gap-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
+                        <i data-lucide="user-plus" class="inline-block w-4 h-4"></i>
+                        <span>Novo Integrante</span>
                     </button>
                 </div>
                 <div class="space-y-3">
@@ -117,13 +167,13 @@
                                 <div>
                                     <h3 class="font-medium text-white" th:text="${integrante.nome}">Nome Integrante</h3>
                                     <p class="text-gray-400 text-sm">
-                                        <span th:text="${integrante.getPercentualDaMeta(meta.valorTotal)}">0</span>% da meta
+                                        <span th:text="${#numbers.formatDecimal(integrante.getPercentualDaMeta(meta.valorTotal), 1, 1)}">0</span>% da meta
                                     </p>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <p class="text-lg font-semibold text-emerald-400">
-                                    R$ <span th:text="${integrante.contribuicao}">0.00</span>
+                                    R$ <span th:text="${#numbers.formatDecimal(integrante.contribuicao, 1, 2)}">0.00</span>
                                 </p>
                             </div>
                         </div>
@@ -141,10 +191,15 @@
                     Ação Rápida
                 </h3>
                 <button @click="modalContribuicao = true"
-                        class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
-                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                    Adicionar Contribuição
+                        th:disabled="${meta.status.name() != 'ATIVA'}"
+                        th:class="${meta.status.name() != 'ATIVA'} ? 'opacity-50 cursor-not-allowed' : ''"
+                        class="w-full flex items-center justify-center gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
+                    <i data-lucide="plus-circle" class="inline-block w-4 h-4"></i>
+                    <span>Adicionar Contribuição</span>
                 </button>
+                <p th:if="${meta.status.name() != 'ATIVA'}" class="text-xs text-gray-500 mt-2 text-center">
+                    Contribuições só podem ser feitas em metas ativas
+                </p>
             </div>
 
             <!-- Relatório -->
@@ -157,6 +212,117 @@
                     <div th:each="linha : ${relatorio}"
                          class="text-sm text-gray-300 p-2 bg-dark-900/30 rounded border-l-2 border-indigo-500/50"
                          th:text="${linha}">Relatório</div>
+                </div>
+            </div>
+
+            <!-- Informações da Meta -->
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-400"></i>
+                    Informações
+                </h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Criada em:</span>
+                        <span class="text-white" th:text="${#temporals.format(meta.criadaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                    </div>
+                    <div th:if="${meta.atingidaEm}" class="flex justify-between">
+                        <span class="text-gray-400">Atingida em:</span>
+                        <span class="text-amber-400" th:text="${#temporals.format(meta.atingidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                    </div>
+                    <div th:if="${meta.concluidaEm}" class="flex justify-between">
+                        <span class="text-gray-400">Concluída em:</span>
+                        <span class="text-emerald-400" th:text="${#temporals.format(meta.concluidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Status:</span>
+                        <span class="text-white capitalize" th:text="${meta.status}">Status</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Parabéns (aparece quando meta for concluída) -->
+    <div x-show="modalParabens" x-transition.opacity.duration.500ms
+         class="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-50">
+        <div @click.away="modalParabens = false"
+             x-transition.scale.origin.center.duration.300ms
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-amber-500/50 p-8 rounded-2xl shadow-2xl w-full max-w-lg mx-4 relative overflow-hidden">
+
+            <!-- Animação de confetes -->
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-4 left-4 w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="absolute top-8 right-6 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                <div class="absolute top-16 left-8 w-1 h-1 bg-red-400 rounded-full animate-bounce" style="animation-delay: 0.5s"></div>
+                <div class="absolute top-12 right-12 w-1 h-1 bg-green-400 rounded-full animate-bounce" style="animation-delay: 0.7s"></div>
+                <div class="absolute bottom-16 left-6 w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="absolute bottom-8 right-8 w-1 h-1 bg-pink-400 rounded-full animate-bounce" style="animation-delay: 0.6s"></div>
+            </div>
+
+            <div class="text-center relative z-10">
+                <!-- Ícone de Troféu -->
+                <div class="w-24 h-24 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                    <i data-lucide="trophy" class="w-12 h-12 text-white"></i>
+                </div>
+
+                <!-- Título -->
+                <h2 class="text-3xl font-bold text-white mb-2">🎉 Parabéns!</h2>
+                <p class="text-amber-400 text-xl font-semibold mb-6">Você atingiu sua meta!</p>
+
+                <!-- Detalhes da Meta -->
+                <div class="bg-dark-900/50 rounded-xl p-6 mb-6 border border-amber-500/30">
+                    <h3 class="text-lg font-bold text-white mb-4" th:text="${meta.nome}">Nome da Meta</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-400">Valor da Meta:</span>
+                            <p class="text-white font-semibold" th:text="${valorTotal}">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Valor Arrecadado:</span>
+                            <p class="text-emerald-400 font-semibold" th:text="${valorAtual}">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Data de Criação:</span>
+                            <p class="text-white font-semibold" th:text="${#temporals.format(meta.criadaEm, 'dd/MM/yyyy')}">Data</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Data de Conquista:</span>
+                            <p class="text-amber-400 font-semibold" th:text="${#temporals.format(meta.atingidaEm ?: meta.criadaEm, 'dd/MM/yyyy')}">Data</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Integrantes -->
+                <div class="bg-dark-900/50 rounded-xl p-4 mb-6 border border-amber-500/30">
+                    <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4 text-amber-400"></i>
+                        Participantes
+                    </h4>
+                    <div class="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                        <div th:each="integrante : ${meta.integrantes}" class="flex justify-between items-center text-sm">
+                            <span class="text-gray-300" th:text="${integrante.nome}">Nome</span>
+                            <span class="text-emerald-400 font-medium">
+                                R$ <span th:text="${#numbers.formatDecimal(integrante.contribuicao, 1, 2)}">0,00</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex gap-3">
+                    <button onclick="window.alert('Funcionalidade será implementada em breve!')"
+                            class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Baixar Certificado
+                    </button>
+
+
+                    <button @click="window.location.href='/'"
+                            class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        Concluir Meta
+                    </button>
                 </div>
             </div>
         </div>
@@ -181,6 +347,9 @@
                     <label class="block text-sm font-medium text-gray-300 mb-2">Nome do Integrante</label>
                     <input type="text" name="nomeIntegrante" placeholder="Digite o nome completo"
                            class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" required>
+                    <div th:if="${erroIntegrante}" class="text-red-600">
+                        <p th:text="${erroIntegrante}"></p>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Contribuição Inicial</label>
@@ -283,6 +452,22 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
+
+        // Verifica se a meta atingiu 100% e automaticamente abre o modal de parabéns
+        const progressElement = document.querySelector('[x-data]');
+        if (progressElement) {
+            const metaValorAtual = parseFloat(document.querySelector('[th\\:text*="meta.valorAtual"]')?.textContent?.replace(/[^\d.,]/g, '').replace(',', '.') || '0');
+            const metaValorTotal = parseFloat(document.querySelector('[th\\:text*="meta.valorTotal"]')?.textContent?.replace(/[^\d.,]/g, '').replace(',', '.') || '1');
+
+            if (metaValorAtual >= metaValorTotal && !window.location.search.includes('concluida=true')) {
+                // Se a meta foi atingida e não veio do redirecionamento de conclusão, abre o modal
+                setTimeout(() => {
+                    if (progressElement._x_dataStack && progressElement._x_dataStack[0]) {
+                        progressElement._x_dataStack[0].modalParabens = true;
+                    }
+                }, 1000);
+            }
+        }
     });
 </script>
 </body>
