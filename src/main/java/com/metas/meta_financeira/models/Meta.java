@@ -1,6 +1,7 @@
 package com.metas.meta_financeira.models;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import jakarta.persistence.*;
@@ -20,6 +21,12 @@ public class Meta  {
 
     @Column(name = "valor_total", precision = 19, scale = 2)
     private BigDecimal valorTotal;
+
+    @Column(name = "atingida_em")
+    private LocalDateTime atingidaEm;
+
+    @Column(name = "concluida_em")
+    private LocalDateTime concluidaEm;
 
     @Enumerated(EnumType.STRING)
     private StatusMeta status = StatusMeta.ATIVA;
@@ -65,8 +72,9 @@ public class Meta  {
                 integrante.adicionarContribuicao(valorAdicionado);
                 this.setValorAtual(this.getValorAtual().add(valorAdicionado));
 
-                if (this.valorAtual.compareTo(this.valorTotal) >= 0) {
+                if (this.valorAtual.compareTo(this.valorTotal) >= 0 && this.getStatus() == StatusMeta.ATIVA) {
                     this.status = StatusMeta.ATINGIDA;
+                    setAtingidaEm(LocalDateTime.now());
                 }
                 return;
             }
@@ -86,6 +94,15 @@ public class Meta  {
             );
         }
         return relatorio;
+    }
+
+    public void concluirMeta() {
+        if (getStatus() == StatusMeta.ATIVA) {
+            throw new IllegalStateException("Não é possível concluir uma meta ainda ativa");
+        }
+        if (getStatus() == StatusMeta.CONCLUIDA) return;
+        setStatus(StatusMeta.CONCLUIDA);
+        this.setConcluidaEm(LocalDateTime.now());
     }
 
     public BigDecimal restanteFaltante() {
@@ -109,6 +126,10 @@ public class Meta  {
             i.setMeta(this);
         }
     }
+    public LocalDateTime getAtingidaEm() { return atingidaEm; }
+    public void setAtingidaEm(LocalDateTime atingidaEm) { this.atingidaEm = atingidaEm; }
+    public LocalDateTime getConcluidaEm() { return concluidaEm; }
+    public void setConcluidaEm(LocalDateTime concluidaEm) { this.concluidaEm = concluidaEm; }
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
     public StatusMeta getStatus() { return status; }
