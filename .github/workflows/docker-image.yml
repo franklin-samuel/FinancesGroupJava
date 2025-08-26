@@ -31,3 +31,12 @@ jobs:
       run: docker build -t samuelfranklindev/meta-financeira .
     - name: Push Docker Image
       run: docker push samuelfranklindev/meta-financeira
+  
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+        - name: Pull image from docker hub
+          run: docker pull samuelfranklindev/meta-financeira:latest
+        - name: Run docker container
+          run: docker run -d -p 8080:8080 --name meta-financeira samuelfranklindev/meta-financeira
