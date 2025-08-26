@@ -39,4 +39,4 @@ jobs:
         - name: Pull image from docker hub
           run: docker pull samuelfranklindev/meta-financeira:latest
         - name: Run docker container
-          run: docker run -d -p 8080:8080 --name meta-financeira samuelfranklindev/meta-financeira
+          run: docker run -d -p 8080:8080 -e DB_USER=${{ secrets.DB_USER }} -e DB_PASS='${{ secrets.DB_PASS }}' -e DB_URL=${{ secrets.DB_URL }} -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} --name meta-financeira samuelfranklindev/meta-financeira
