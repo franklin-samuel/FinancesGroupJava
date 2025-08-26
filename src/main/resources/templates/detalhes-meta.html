@@ -43,42 +43,44 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
         }
     </script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 text-gray-100">
-<div class="container mx-auto px-6 py-8 max-w-6xl">
+<body class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 text-gray-100 overflow-x-hidden">
+<div class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-6xl">
     <!-- Cabeçalho -->
-    <div class="mb-8">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <div>
-                <div class="flex items-center gap-3 mb-2">
-                    <h1 class="text-3xl font-bold text-white" th:text="${meta.nome}">Nome da Meta</h1>
-                    <span th:if="${meta.status.name() == 'ATINGIDA'}" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                        🎉 ATINGIDA!
-                    </span>
-                    <span th:if="${meta.status.name() == 'ATIVA'}" class="bg-blue-500/20 text-blue-400 text-sm font-medium px-3 py-1 rounded-full border border-blue-500/30">
-                        ATIVA
-                    </span>
-                    <span th:if="${meta.status.name() == 'CONCLUIDA'}" class="bg-emerald-500/20 text-emerald-400 text-sm font-medium px-3 py-1 rounded-full border border-emerald-500/30">
-                        CONCLUÍDA
-                    </span>
+    <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col gap-4 sm:gap-6">
+            <div class="order-2 sm:order-1">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white break-words" th:text="${meta.nome}">Nome da Meta</h1>
+                    <div class="flex flex-wrap gap-2">
+                        <span th:if="${meta.status.name() == 'ATINGIDA'}" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+                            🎉 ATINGIDA!
+                        </span>
+                        <span th:if="${meta.status.name() == 'ATIVA'}" class="bg-blue-500/20 text-blue-400 text-sm font-medium px-3 py-1 rounded-full border border-blue-500/30 whitespace-nowrap">
+                            ATIVA
+                        </span>
+                        <span th:if="${meta.status.name() == 'CONCLUIDA'}" class="bg-emerald-500/20 text-emerald-400 text-sm font-medium px-3 py-1 rounded-full border border-emerald-500/30 whitespace-nowrap">
+                            CONCLUÍDA
+                        </span>
+                    </div>
                 </div>
-                <p class="text-gray-400">Gerencie sua meta financeira e acompanhe o progresso</p>
+                <p class="text-gray-400 text-sm sm:text-base">Gerencie sua meta financeira e acompanhe o progresso</p>
             </div>
-            <div class="flex gap-3">
+            <div class="order-1 sm:order-2 flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <!-- Botão de Concluir Meta (só aparece se status for ATINGIDA) -->
                 <form th:if="${meta.status.name() == 'ATINGIDA'}" th:action="@{/meta/{id}/concluir(id=${meta.id})}" method="post" class="inline">
                     <button type="submit"
-                            class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 transform hover:scale-105">
+                            class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 sm:px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 transform hover:scale-105 text-sm sm:text-base">
                         <i data-lucide="check-circle" class="w-4 h-4"></i>
                         Concluir Meta
                     </button>
                 </form>
 
                 <button @click="modalExcluir = true"
-                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25">
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 sm:px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25 text-sm sm:text-base">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                     Excluir
                 </button>
-                <a href="/" class="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg border border-dark-600">
+                <a href="/" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white px-4 sm:px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg border border-dark-600 text-sm sm:text-base">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     Voltar
                 </a>
@@ -87,55 +89,55 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
     </div>
 
     <!-- Grid Principal -->
-    <div class="grid lg:grid-cols-3 gap-8">
+    <div class="grid lg:grid-cols-3 gap-6 sm:gap-8">
         <!-- Coluna Principal -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-6 sm:space-y-8">
             <!-- Informações Financeiras -->
-            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
-                <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                    <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-400"></i>
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-4 sm:p-6 shadow-2xl">
+                <h2 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+                    <i data-lucide="dollar-sign" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400"></i>
                     Resumo Financeiro
                 </h2>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                    <div class="bg-dark-900/50 rounded-lg p-3 sm:p-4 border border-dark-600/30">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-400 text-sm font-medium">Meta Total</span>
+                            <span class="text-gray-400 text-xs sm:text-sm font-medium">Meta Total</span>
                             <i data-lucide="target" class="w-4 h-4 text-blue-400"></i>
                         </div>
-                        <p class="text-2xl font-bold text-white">
+                        <p class="text-lg sm:text-2xl font-bold text-white">
                             <span th:text="${valorTotal}">R$ 0,00</span>
                         </p>
                     </div>
-                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                    <div class="bg-dark-900/50 rounded-lg p-3 sm:p-4 border border-dark-600/30">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-400 text-sm font-medium">Valor Atual</span>
+                            <span class="text-gray-400 text-xs sm:text-sm font-medium">Valor Atual</span>
                             <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
                         </div>
-                        <p class="text-2xl font-bold text-emerald-400">
+                        <p class="text-lg sm:text-2xl font-bold text-emerald-400">
                             <span th:text="${valorAtual}">R$ 0,00</span>
                         </p>
                     </div>
-                    <div class="bg-dark-900/50 rounded-lg p-4 border border-dark-600/30">
+                    <div class="bg-dark-900/50 rounded-lg p-3 sm:p-4 border border-dark-600/30 sm:col-span-2 md:col-span-1">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-400 text-sm font-medium">Restante</span>
+                            <span class="text-gray-400 text-xs sm:text-sm font-medium">Restante</span>
                             <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
                         </div>
-                        <p class="text-2xl font-bold text-amber-400">
+                        <p class="text-lg sm:text-2xl font-bold text-amber-400">
                             <span th:text="${restante}">R$ 0,00</span>
                         </p>
                     </div>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="mt-6">
-                    <div class="flex justify-between text-sm text-gray-400 mb-2">
+                <div class="mt-4 sm:mt-6">
+                    <div class="flex justify-between text-xs sm:text-sm text-gray-400 mb-2">
                         <span>Progresso</span>
                         <span>
                             <span th:text="${#numbers.formatDecimal((meta.valorAtual / meta.valorTotal) * 100, 1, 1)}">0.0</span>%
                         </span>
                     </div>
-                    <div class="w-full bg-dark-700/50 rounded-full h-3">
-                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 relative overflow-hidden"
+                    <div class="w-full bg-dark-700/50 rounded-full h-2 sm:h-3">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 sm:h-3 rounded-full transition-all duration-500 relative overflow-hidden"
                              th:style="'width: ' + ${(meta.valorAtual / meta.valorTotal) * 100} + '%'">
                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
                         </div>
@@ -144,36 +146,36 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
             </div>
 
             <!-- Integrantes -->
-            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-semibold text-white flex items-center gap-2">
-                        <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-4 sm:p-6 shadow-2xl">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <h2 class="text-lg sm:text-xl font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
                         Integrantes
                     </h2>
                     <button @click="modalIntegrante = true"
                             th:disabled="${meta.status.name() != 'ATIVA'}"
                             th:class="${meta.status.name() != 'ATIVA'} ? 'opacity-50 cursor-not-allowed' : ''"
-                            class="flex items-center gap-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
+                            class="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 text-sm sm:text-base">
                         <i data-lucide="user-plus" class="inline-block w-4 h-4"></i>
                         <span>Novo Integrante</span>
                     </button>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-2 sm:space-y-3">
                     <div th:each="integrante : ${meta.integrantes}"
-                         class="bg-dark-900/50 border border-dark-600/30 rounded-lg p-4 hover:bg-dark-800/50 transition-all duration-200">
-                        <div class="flex justify-between items-center">
+                         class="bg-dark-900/50 border border-dark-600/30 rounded-lg p-3 sm:p-4 hover:bg-dark-800/50 transition-all duration-200">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm shrink-0"
                                      th:text="${integrante.nome.substring(0,1).toUpperCase()}">N</div>
-                                <div>
-                                    <h3 class="font-medium text-white" th:text="${integrante.nome}">Nome Integrante</h3>
-                                    <p class="text-gray-400 text-sm">
+                                <div class="min-w-0">
+                                    <h3 class="font-medium text-white text-sm sm:text-base break-words" th:text="${integrante.nome}">Nome Integrante</h3>
+                                    <p class="text-gray-400 text-xs sm:text-sm">
                                         <span th:text="${#numbers.formatDecimal(integrante.getPercentualDaMeta(meta.valorTotal), 1, 1)}">0</span>% da meta
                                     </p>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-lg font-semibold text-emerald-400">
+                            <div class="text-left sm:text-right">
+                                <p class="text-base sm:text-lg font-semibold text-emerald-400">
                                     R$ <span th:text="${#numbers.formatDecimal(integrante.contribuicao, 1, 2)}">0.00</span>
                                 </p>
                             </div>
@@ -184,17 +186,17 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
         </div>
 
         <!-- Sidebar -->
-        <div class="space-y-8">
+        <div class="space-y-6 sm:space-y-8">
             <!-- Ação Rápida -->
-            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
-                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-4 sm:p-6 shadow-2xl">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-400"></i>
                     Ação Rápida
                 </h3>
                 <button @click="modalContribuicao = true"
                         th:disabled="${meta.status.name() != 'ATIVA'}"
                         th:class="${meta.status.name() != 'ATIVA'} ? 'opacity-50 cursor-not-allowed' : ''"
-                        class="w-full flex items-center justify-center gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
+                        class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 text-sm sm:text-base">
                     <i data-lucide="plus-circle" class="inline-block w-4 h-4"></i>
                     <span>Adicionar Contribuição</span>
                 </button>
@@ -204,40 +206,40 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
             </div>
 
             <!-- Relatório -->
-            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
-                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i>
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-4 sm:p-6 shadow-2xl">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400"></i>
                     Relatório de Contribuições
                 </h3>
-                <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                <div class="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
                     <div th:each="linha : ${relatorio}"
-                         class="text-sm text-gray-300 p-2 bg-dark-900/30 rounded border-l-2 border-indigo-500/50"
+                         class="text-xs sm:text-sm text-gray-300 p-2 bg-dark-900/30 rounded border-l-2 border-indigo-500/50"
                          th:text="${linha}">Relatório</div>
                 </div>
             </div>
 
             <!-- Informações da Meta -->
-            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-6 shadow-2xl">
-                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <i data-lucide="info" class="w-5 h-5 text-blue-400"></i>
+            <div class="bg-gradient-to-r from-dark-800/80 to-dark-700/80 backdrop-blur-sm border border-dark-600/50 rounded-xl p-4 sm:p-6 shadow-2xl">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
                     Informações
                 </h3>
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
+                <div class="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                    <div class="flex justify-between gap-2">
                         <span class="text-gray-400">Criada em:</span>
-                        <span class="text-white" th:text="${#temporals.format(meta.criadaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                        <span class="text-white text-right" th:text="${#temporals.format(meta.criadaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
                     </div>
-                    <div th:if="${meta.atingidaEm}" class="flex justify-between">
+                    <div th:if="${meta.atingidaEm}" class="flex justify-between gap-2">
                         <span class="text-gray-400">Atingida em:</span>
-                        <span class="text-amber-400" th:text="${#temporals.format(meta.atingidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                        <span class="text-amber-400 text-right" th:text="${#temporals.format(meta.atingidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
                     </div>
-                    <div th:if="${meta.concluidaEm}" class="flex justify-between">
+                    <div th:if="${meta.concluidaEm}" class="flex justify-between gap-2">
                         <span class="text-gray-400">Concluída em:</span>
-                        <span class="text-emerald-400" th:text="${#temporals.format(meta.concluidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
+                        <span class="text-emerald-400 text-right" th:text="${#temporals.format(meta.concluidaEm, 'dd/MM/yyyy HH:mm')}">Data</span>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between gap-2">
                         <span class="text-gray-400">Status:</span>
-                        <span class="text-white capitalize" th:text="${meta.status}">Status</span>
+                        <span class="text-white capitalize text-right" th:text="${meta.status}">Status</span>
                     </div>
                 </div>
             </div>
@@ -246,10 +248,10 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 
     <!-- Modal de Parabéns (aparece quando meta for concluída) -->
     <div x-show="modalParabens" x-transition.opacity.duration.500ms
-         class="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-50">
+         class="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-4">
         <div @click.away="modalParabens = false"
              x-transition.scale.origin.center.duration.300ms
-             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-amber-500/50 p-8 rounded-2xl shadow-2xl w-full max-w-lg mx-4 relative overflow-hidden">
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-amber-500/50 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden">
 
             <!-- Animação de confetes -->
             <div class="absolute inset-0 pointer-events-none">
@@ -263,18 +265,18 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 
             <div class="text-center relative z-10">
                 <!-- Ícone de Troféu -->
-                <div class="w-24 h-24 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                    <i data-lucide="trophy" class="w-12 h-12 text-white"></i>
+                <div class="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 animate-pulse">
+                    <i data-lucide="trophy" class="w-8 h-8 sm:w-12 sm:h-12 text-white"></i>
                 </div>
 
                 <!-- Título -->
-                <h2 class="text-3xl font-bold text-white mb-2">🎉 Parabéns!</h2>
-                <p class="text-amber-400 text-xl font-semibold mb-6">Você atingiu sua meta!</p>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">🎉 Parabéns!</h2>
+                <p class="text-amber-400 text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Você atingiu sua meta!</p>
 
                 <!-- Detalhes da Meta -->
-                <div class="bg-dark-900/50 rounded-xl p-6 mb-6 border border-amber-500/30">
-                    <h3 class="text-lg font-bold text-white mb-4" th:text="${meta.nome}">Nome da Meta</h3>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-dark-900/50 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-amber-500/30">
+                    <h3 class="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4 break-words" th:text="${meta.nome}">Nome da Meta</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
                             <span class="text-gray-400">Valor da Meta:</span>
                             <p class="text-white font-semibold" th:text="${valorTotal}">R$ 0,00</p>
@@ -295,15 +297,15 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
                 </div>
 
                 <!-- Lista de Integrantes -->
-                <div class="bg-dark-900/50 rounded-xl p-4 mb-6 border border-amber-500/30">
-                    <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
+                <div class="bg-dark-900/50 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border border-amber-500/30">
+                    <h4 class="text-white font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
                         <i data-lucide="users" class="w-4 h-4 text-amber-400"></i>
                         Participantes
                     </h4>
-                    <div class="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
-                        <div th:each="integrante : ${meta.integrantes}" class="flex justify-between items-center text-sm">
-                            <span class="text-gray-300" th:text="${integrante.nome}">Nome</span>
-                            <span class="text-emerald-400 font-medium">
+                    <div class="space-y-1 sm:space-y-2 max-h-24 sm:max-h-32 overflow-y-auto custom-scrollbar">
+                        <div th:each="integrante : ${meta.integrantes}" class="flex justify-between items-center text-xs sm:text-sm gap-2">
+                            <span class="text-gray-300 truncate" th:text="${integrante.nome}">Nome</span>
+                            <span class="text-emerald-400 font-medium whitespace-nowrap">
                                 R$ <span th:text="${#numbers.formatDecimal(integrante.contribuicao, 1, 2)}">0,00</span>
                             </span>
                         </div>
@@ -311,16 +313,15 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
                 </div>
 
                 <!-- Botões de Ação -->
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <a th:href="@{'/meta/' + ${meta.id} + '/certificado'}"
-                       class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2">
+                       class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2 text-sm sm:text-base">
                         <i data-lucide="download" class="w-4 h-4"></i>
                         Baixar Certificado
                     </a>
 
-
                     <button @click="window.location.href='/'"
-                            class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2">
+                            class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm sm:text-base">
                         <i data-lucide="check-circle" class="w-4 h-4"></i>
                         Concluir Meta
                     </button>
@@ -331,34 +332,34 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 
     <!-- Modal Adicionar Integrante -->
     <div x-show="modalIntegrante" x-transition.opacity.duration.300ms
-         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50 p-4">
         <div @click.away="modalIntegrante = false"
              x-transition.scale.origin.center.duration.200ms
-             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
             <button @click="modalIntegrante = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold text-white mb-2">Adicionar Integrante</h3>
-                <p class="text-gray-400">Adicione um novo membro à sua meta</p>
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Adicionar Integrante</h3>
+                <p class="text-gray-400 text-sm sm:text-base">Adicione um novo membro à sua meta</p>
             </div>
-            <form th:action="@{/meta/{id}/adicionarIntegrante(id=${meta.id})}" method="post" class="space-y-4">
+            <form th:action="@{/meta/{id}/adicionarIntegrante(id=${meta.id})}" method="post" class="space-y-3 sm:space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Nome do Integrante</label>
                     <input type="text" name="nomeIntegrante" placeholder="Digite o nome completo"
-                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" required>
-                    <div th:if="${erroIntegrante}" class="text-red-600">
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm sm:text-base" required>
+                    <div th:if="${erroIntegrante}" class="text-red-600 text-xs sm:text-sm mt-1">
                         <p th:text="${erroIntegrante}"></p>
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Contribuição Inicial</label>
                     <input type="number" name="contribuicaoInicial" step="0.01" placeholder="0,00"
-                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" required>
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm sm:text-base" required>
                 </div>
                 <button type="submit"
-                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 mt-6">
+                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 mt-4 sm:mt-6 text-sm sm:text-base">
                     Adicionar Integrante
                 </button>
             </form>
@@ -367,23 +368,23 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 
     <!-- Modal Adicionar Contribuição -->
     <div x-show="modalContribuicao" x-transition.opacity.duration.300ms
-         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50 p-4">
         <div @click.away="modalContribuicao = false"
              x-transition.scale.origin.center.duration.200ms
-             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
             <button @click="modalContribuicao = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold text-white mb-2">Nova Contribuição</h3>
-                <p class="text-gray-400">Registre uma nova contribuição para a meta</p>
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Nova Contribuição</h3>
+                <p class="text-gray-400 text-sm sm:text-base">Registre uma nova contribuição para a meta</p>
             </div>
-            <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="space-y-4">
+            <form th:action="@{/meta/{id}/contribuir(id=${meta.id})}" method="post" class="space-y-3 sm:space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Integrante</label>
                     <select name="nomeIntegrante"
-                            class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" required>
+                            class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm sm:text-base" required>
                         <option value="" class="text-gray-500">Selecione um integrante</option>
                         <option th:each="integrante : ${meta.integrantes}"
                                 th:value="${integrante.nome}"
@@ -393,10 +394,10 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Valor da Contribuição</label>
                     <input type="number" name="valor" step="0.01" placeholder="0,00"
-                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" required>
+                           class="w-full bg-dark-900/50 border border-dark-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm sm:text-base" required>
                 </div>
                 <button type="submit"
-                        class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 mt-6">
+                        class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 mt-4 sm:mt-6 text-sm sm:text-base">
                     Registrar Contribuição
                 </button>
             </form>
@@ -405,25 +406,25 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 
     <!-- Modal Excluir Meta -->
     <div x-show="modalExcluir" x-transition.opacity.duration.300ms
-         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50 p-4">
         <div @click.away="modalExcluir = false"
              x-transition.scale.origin.center.duration.200ms
-             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
-            <div class="mb-6">
-                <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+             class="bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-600 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
+            <div class="mb-4 sm:mb-6">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6 text-red-400"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-white mb-2 text-center">Confirmar Exclusão</h3>
-                <p class="text-gray-400 text-center">Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</p>
+                <h3 class="text-xl sm:text-2xl font-bold text-white mb-2 text-center">Confirmar Exclusão</h3>
+                <p class="text-gray-400 text-center text-sm sm:text-base">Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button @click="modalExcluir = false"
-                        class="flex-1 px-4 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white rounded-lg font-medium transition-all duration-200 border border-dark-600">
+                        class="order-2 sm:order-1 flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white rounded-lg font-medium transition-all duration-200 border border-dark-600 text-sm sm:text-base">
                     Cancelar
                 </button>
-                <form th:action="@{/meta/{id}/excluir(id=${meta.id})}" method="post" class="flex-1">
+                <form th:action="@{/meta/{id}/excluir(id=${meta.id})}" method="post" class="flex-1 order-1 sm:order-2">
                     <button type="submit"
-                            class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25">
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25 text-sm sm:text-base">
                         Sim, Excluir
                     </button>
                 </form>
@@ -433,8 +434,11 @@ class="min-h-screen bg-gradient-to-br from-dark-900 via-slate-900 to-dark-800 te
 </div>
 
 <style>
-    body {
+    html, body {
         height: 100%;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        background-attachment: fixed;
         padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-top: env(safe-area-inset-top);
