@@ -1,5 +1,7 @@
 # FinTrack
 
+[Acesse Aqui! - FinTrack](https://fintrack-c9cm.onrender.com)
+
 Gerenciador colaborativo de **metas financeiras em grupo**, com geração de certificados personalizados ao atingir os objetivos.  
 Construído com **Java + Spring** e uma stack moderna de frontend e infraestrutura.
 
@@ -23,6 +25,7 @@ A autenticação é feita via **Google OAuth2**, garantindo segurança e pratici
 - ✅ Interface web responsiva com **Thymeleaf + TailwindCSS + AlpineJS**
 - ✅ Persistência com **PostgreSQL**
 - ✅ Deploy em **Render** com **Docker**
+- ✅ CI/CD com **Github Actions**
 
 ---
 
@@ -34,6 +37,7 @@ A autenticação é feita via **Google OAuth2**, garantindo segurança e pratici
 - Jakarta Persistence (JPA)
 - PostgreSQL
 - BufferedImage & Graphics2D (certificados)
+- Docker compose
 
 ### Frontend
 - HTML + Thymeleaf
@@ -43,6 +47,7 @@ A autenticação é feita via **Google OAuth2**, garantindo segurança e pratici
 ### Infra
 - Docker
 - Render (Deploy)
+- Github Actions
 
 ---
 
