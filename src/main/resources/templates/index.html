@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinTrack - Gerenciador de Metas</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
@@ -166,12 +167,17 @@
             </div>
 
             <!-- Ações do Cabeçalho -->
-            <div class="flex justify-center">
+            <div class="flex justify-center gap-4">
                 <button @click="openModal = true"
                         class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105">
                     <i data-lucide="plus-circle" class="w-5 h-5"></i>
                     Criar Nova Meta
                 </button>
+                <a href="/meta/arquivadas"
+                   class="flex items-center gap-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-2xl hover:shadow-emerald-500/25 transform hover:scale-105">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
+                    Metas Arquivadas
+                </a>
             </div>
         </div>
 
@@ -207,19 +213,41 @@
                                     <span th:text="${meta.nome.substring(0,1).toUpperCase()}">M</span>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors" th:text="${meta.nome}">Nome da Meta</h3>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors" th:text="${meta.nome}">Nome da Meta</h3>
+                                        <span th:if="${meta.status.name() == 'ATINGIDA'}" class="bg-amber-500/20 text-amber-400 text-xs font-medium px-2 py-1 rounded-full border border-amber-500/30">
+                                            ATINGIDA!
+                                        </span>
+                                        <span th:if="${meta.status.name() == 'ATIVA'}" class="bg-blue-500/20 text-blue-400 text-xs font-medium px-2 py-1 rounded-full border border-blue-500/30">
+                                            ATIVA
+                                        </span>
+                                    </div>
                                     <p class="text-gray-400 text-sm">Clique para ver detalhes e gerenciar</p>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <div class="flex items-center gap-2 mb-1">
                                     <i data-lucide="dollar-sign" class="w-4 h-4 text-emerald-400"></i>
-                                    <span class="text-2xl font-bold text-emerald-400" th:text="${meta.valorTotal}">R$ 0.00</span>
+                                    <span class="text-2xl font-bold text-emerald-400" th:text="${#numbers.formatDecimal(meta.valorTotal, 1, 2)}">R$ 0.00</span>
                                 </div>
                                 <div class="flex items-center gap-2 text-gray-400">
                                     <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"></i>
                                     <span class="text-sm">Ver detalhes</span>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Progresso</span>
+                                <span>
+                                    <span th:text="${#numbers.formatDecimal((meta.valorAtual / meta.valorTotal) * 100, 1, 1)}">0.0</span>%
+                                </span>
+                            </div>
+                            <div class="w-full bg-dark-700/50 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                                     th:style="'width: ' + ${(meta.valorAtual / meta.valorTotal) * 100} + '%'"></div>
                             </div>
                         </div>
                     </div>

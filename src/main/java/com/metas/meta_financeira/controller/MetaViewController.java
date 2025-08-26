@@ -4,8 +4,12 @@ import com.metas.meta_financeira.models.Integrante;
 import com.metas.meta_financeira.models.Meta;
 import com.metas.meta_financeira.models.Moeda;
 import com.metas.meta_financeira.models.User;
+import com.metas.meta_financeira.services.CertificadoService;
 import com.metas.meta_financeira.services.MetaService;
 import com.metas.meta_financeira.services.UserService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -18,6 +22,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.servlet.function.RequestPredicates.contentType;
+
 @Controller
 @RequestMapping("/meta")
 public class MetaViewController {
@@ -26,10 +32,12 @@ public class MetaViewController {
 
     private final MetaService metaService;
     private final UserService userService;
+    private final CertificadoService certificadoService;
 
-    public MetaViewController(MetaService metaService, UserService userService) {
+    public MetaViewController(MetaService metaService, UserService userService, CertificadoService certificadoService) {
         this.metaService = metaService;
         this.userService = userService;
+        this.certificadoService = certificadoService;
     }
 
     // Listar metas do usuário logado
@@ -44,6 +52,34 @@ public class MetaViewController {
         } catch (Exception e) {
             log.error("[LOG] Erro ao listar metas", e);
             return "error";
+        }
+    }
+
+    // Página de histórico(arquivadas)
+    @GetMapping("/arquivadas")
+    public String arquivadas(Model model, @AuthenticationPrincipal OAuth2User principal) {
+        try {
+            log.info("[LOG] Iniciando listagem de metas arquivadas");
+            User user = extrairOuCriarUser(principal);
+            model.addAttribute("metasConcluidas", metaService.listarMetasConcluidas(user));
+            log.info("[LOG] Listagem de metas concluídas para usuário {}", user.getEmail());
+            return "metas-arquivadas";
+        } catch (Exception e) {
+            log.error("[LOG] Erro ao listar metas concluídas", e);
+            return "error";
+        }
+    }
+
+    // Concluir meta -> Mostrar página de parabéns
+    @PostMapping("/{id}/concluir")
+    public String concluirMeta(@PathVariable Long id) {
+        try {
+            log.info("[LOG] Concluindo meta {}...", id);
+            metaService.concluirMeta(id);
+            return "redirect:/meta/" + id + "?concluida=true";
+        } catch (Exception e) {
+            log.error("Não foi possível concluír a meta {}", id);
+            throw e;
         }
     }
 
@@ -130,6 +166,22 @@ public class MetaViewController {
         } catch (Exception e) {
             log.error("[LOG] Erro ao registrar contribuição de '{}' na meta id={}", nomeIntegrante, id, e);
             return "error";
+        }
+    }
+
+    @GetMapping("/{id}/certificado")
+    public ResponseEntity<byte[]> gerarCertificado(@PathVariable Long id) {
+        try {
+            Meta meta = metaService.buscarMetaPorId(id);
+            byte[] certificado = certificadoService.gerarCertificado(meta);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=certificado_" + meta.getNome() + ".jpg")
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(certificado);
+        } catch (Exception e) {
+            log.error("[LOG] Erro ao gerar certificado da meta id={}", id, e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

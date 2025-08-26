@@ -2,6 +2,7 @@ package com.metas.meta_financeira.services;
 
 import com.metas.meta_financeira.models.Integrante;
 import com.metas.meta_financeira.models.Meta;
+import com.metas.meta_financeira.models.StatusMeta;
 import com.metas.meta_financeira.models.User;
 import com.metas.meta_financeira.repositories.MetaRepository;
 import com.metas.meta_financeira.repositories.UserRespository;
@@ -62,9 +63,25 @@ public class MetaService {
                 throw new IllegalArgumentException("Usuário não pode ser nulo ao listar metas.");
             }
             logger.info("[LOG] Listando metas do usuário id={}, email={}", owner.getId(), owner.getEmail());
-            List<Meta> metasByOwner = metaRepository.findByOwner(owner);
+            List<Meta> metasByOwner = metaRepository.findByOwnerAndStatusIn(owner, List.of(StatusMeta.ATIVA, StatusMeta.ATINGIDA));
             logger.info("[LOG] {} metas encontradas para usuário {}", metasByOwner.size(), owner.getEmail());
             return metasByOwner;
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao listar metas", e);
+            throw e;
+        }
+    }
+
+    // Listar metas concluídas/arquivadas
+    public List<Meta> listarMetasConcluidas(User owner) {
+        try {
+            if (owner == null) {
+                throw new IllegalArgumentException("Usuário não pode ser nulo ao listar metas.");
+            }
+            logger.info("[LOG] Listando metas concluídas do usuário id={}, email={}", owner.getId(), owner.getEmail());
+            List<Meta> metasConcluidas = metaRepository.findByOwnerAndStatusIn(owner, List.of(StatusMeta.CONCLUIDA));
+            logger.info("[LOG] {} metas concluídas para usuário {}", metasConcluidas.size(), owner.getEmail());
+            return metasConcluidas;
         } catch (Exception e) {
             logger.error("[LOG] Erro ao listar metas", e);
             throw e;
@@ -170,6 +187,19 @@ public class MetaService {
         } catch (Exception e) {
             logger.error("[LOG] Erro ao gerar relatório da meta id={}", metaId, e);
             throw e;
+        }
+    }
+
+    // Concluir meta
+    @Transactional
+    public void concluirMeta(Long id) {
+        try {
+            logger.info("[LOG] Concluindo meta id={}", id);
+            Meta meta = buscarMetaPorId(id);
+            meta.concluirMeta();
+            logger.info("[LOG] Meta id={} concluída com sucesso", id);
+        } catch (Exception e) {
+            logger.error("[LOG] Erro ao concluir meta id={}", id);
         }
     }
 

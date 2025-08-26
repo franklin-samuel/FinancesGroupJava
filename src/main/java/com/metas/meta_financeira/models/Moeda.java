@@ -7,7 +7,7 @@ public class Moeda {
 
     private BigDecimal valor;
     private static final String UNIDADE_MONETARIA = "R$";
-    private static final DecimalFormat FORMATO = new DecimalFormat(UNIDADE_MONETARIA + " #,###,##0,00");
+    private static final DecimalFormat FORMATO = new DecimalFormat(UNIDADE_MONETARIA + " #,###,##0.00");
 
     public Moeda(BigDecimal valor) {
         this.valor = valor != null ? valor : BigDecimal.ZERO;

@@ -1,9 +1,12 @@
 package com.metas.meta_financeira.models;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 @Entity
 @Table(name = "meta")
@@ -21,6 +24,18 @@ public class Meta  {
     @Column(name = "valor_total", precision = 19, scale = 2)
     private BigDecimal valorTotal;
 
+    @Column(name = "criada_em")
+    private LocalDateTime criadaEm;
+
+    @Column(name = "atingida_em")
+    private LocalDateTime atingidaEm;
+
+    @Column(name = "concluida_em")
+    private LocalDateTime concluidaEm;
+
+    @Enumerated(EnumType.STRING)
+    private StatusMeta status = StatusMeta.ATIVA;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -35,6 +50,7 @@ public class Meta  {
         this.nome = nome;
         this.valorTotal = valorTotal != null ? valorTotal : BigDecimal.ZERO;
         this.valorAtual = BigDecimal.ZERO;
+        this.criadaEm = LocalDateTime.now();
         this.owner = owner;
     }
 
@@ -45,14 +61,27 @@ public class Meta  {
     }
 
     public void adicionarContribuicaoIntegrante(String nome, BigDecimal valor) {
+        if (status != StatusMeta.ATIVA) {
+            throw new IllegalStateException("Não é possível contribuir para uma meta já concluída.");
+        }
+
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor da contribuição deve ser maior que zero.");
         }
 
+        BigDecimal faltante = restanteFaltante();
+
+        BigDecimal valorAdicionado = valor.compareTo(faltante) > 0 ? faltante : valor;
+
         for(Integrante integrante : integrantes) {
             if (integrante.getNome().equalsIgnoreCase(nome)) {
-                integrante.adicionarContribuicao(valor);
-                this.setValorAtual(this.getValorAtual().add(valor));
+                integrante.adicionarContribuicao(valorAdicionado);
+                this.setValorAtual(this.getValorAtual().add(valorAdicionado));
+
+                if (this.valorAtual.compareTo(this.valorTotal) >= 0 && this.getStatus() == StatusMeta.ATIVA) {
+                    this.status = StatusMeta.ATINGIDA;
+                    setAtingidaEm(LocalDateTime.now());
+                }
                 return;
             }
         }
@@ -73,8 +102,18 @@ public class Meta  {
         return relatorio;
     }
 
+    public void concluirMeta() {
+        if (getStatus() == StatusMeta.ATIVA) {
+            throw new IllegalStateException("Não é possível concluir uma meta ainda ativa");
+        }
+        if (getStatus() == StatusMeta.CONCLUIDA) return;
+        setStatus(StatusMeta.CONCLUIDA);
+        this.setConcluidaEm(LocalDateTime.now());
+    }
+
     public BigDecimal restanteFaltante() {
-        return getValorTotal().subtract(getValorAtual());
+        BigDecimal restante = valorTotal.subtract(valorAtual);
+        return restante.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : restante;
     }
 
 
@@ -93,6 +132,14 @@ public class Meta  {
             i.setMeta(this);
         }
     }
+    public LocalDateTime getCriadaEm() { return criadaEm; }
+    public void setCriadaEm(LocalDateTime criadaEm) { this.criadaEm = criadaEm; }
+    public LocalDateTime getAtingidaEm() { return atingidaEm; }
+    public void setAtingidaEm(LocalDateTime atingidaEm) { this.atingidaEm = atingidaEm; }
+    public LocalDateTime getConcluidaEm() { return concluidaEm; }
+    public void setConcluidaEm(LocalDateTime concluidaEm) { this.concluidaEm = concluidaEm; }
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
+    public StatusMeta getStatus() { return status; }
+    public void setStatus(StatusMeta status) { this.status = status; }
 }
