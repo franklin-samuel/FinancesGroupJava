@@ -138,16 +138,19 @@ public class MetaViewController {
     public String adicionarIntegrante(
             @PathVariable Long id,
             @RequestParam String nomeIntegrante,
-            @RequestParam BigDecimal contribuicaoInicial
+            @RequestParam BigDecimal contribuicaoInicial,
+            Model model
     ) {
         try {
             log.info("[LOG] Adicionando integrante '{}' na meta id={} com contribuição inicial={}", nomeIntegrante, id, contribuicaoInicial);
             metaService.adicionarIntegrante(id, nomeIntegrante, contribuicaoInicial);
             log.info("[LOG] Integrante '{}' adicionado com sucesso na meta id={}", nomeIntegrante, id);
             return "redirect:/meta/" + id;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             log.error("[LOG] Erro ao adicionar integrante '{}' na meta id={}", nomeIntegrante, id, e);
-            return "error";
+            model.addAttribute("meta", metaService.buscarMetaPorId(id));
+            model.addAttribute("erroIntegrante", e.getMessage());
+            return "meta-detalhes";
         }
     }
 
