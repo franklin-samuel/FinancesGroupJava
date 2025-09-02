@@ -62,7 +62,7 @@ A autenticação é feita via **Google OAuth2**, garantindo segurança e pratici
 ### Passos
 ```bash
 # Clonar o repositório
-git clone https://github.com/seu-usuario/FinancesGroupJava.git
+git clone https://github.com/franklin-samuel/FinancesGroupJava.git
 cd fintrack
 
 # Construir o projeto
